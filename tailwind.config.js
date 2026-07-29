@@ -1,0 +1,42 @@
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: ["./src/**/*.{js,jsx,ts,tsx}"],
+  presets: [require("nativewind/preset")],
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        navy: "#0f172a",
+        "navy-mid": "#1e3a5f",
+        "navy-light": "#1a4a7a",
+        gold: "#b8972a",
+        "gold-light": "#d4a843",
+        blue: "#2563eb",
+        bg: "var(--color-bg)",
+        surface: "var(--color-surface)",
+        "surface-end": "var(--color-surface-end)",
+        border: "var(--color-border)",
+        muted: "var(--color-muted)",
+        text: "var(--color-text)",
+        success: "#16a34a",
+        warning: "#d97706",
+        error: "#dc2626",
+        info: "#0284c7",
+        "brand-start": "#ad46ff",
+        "brand-mid": "#f6339a",
+        "brand-end": "#ff6900",
+        "logo-start": "#fb575d",
+        "logo-mid": "#dc558b",
+        "logo-end": "#b754c0",
+        "logo-dot": "#ff3131",
+      },
+      borderRadius: {
+        sm: "0.25rem",
+        md: "0.5rem",
+        lg: "1rem",
+        xl: "1.5rem",
+      },
+    },
+  },
+  plugins: [],
+};

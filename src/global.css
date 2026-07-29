@@ -1,9 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
-  --font-display:
-    Spline Sans, Inter, ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji,
-    Segoe UI Symbol, Noto Color Emoji;
-  --font-mono:
-    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
-  --font-rounded: 'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif;
-  --font-serif: Georgia, 'Times New Roman', serif;
+  --wp-gradient: linear-gradient(90deg, #ad46ff 0%, #f6339a 50%, #ff6900 100%);
+  --wp-btn-shadow:
+    0 8px 24px rgba(246, 51, 154, 0.25), 0 0 20px rgba(173, 70, 255, 0.15),
+    0 0 40px rgba(246, 51, 154, 0.12);
+
+  --color-navy: #0f172a;
+  --color-navy-mid: #1e3a5f;
+  --color-navy-light: #1a4a7a;
+  --color-gold: #b8972a;
+  --color-gold-light: #d4a843;
+  --color-blue: #2563eb;
+
+  --color-bg: #ffffff;
+  --color-surface: #ffffff;
+  --color-surface-end: #f4f4f5;
+  --color-border: #e4e4e7;
+  --color-muted: #71717a;
+  --color-text: #0e0b11;
+
+  --color-success: #16a34a;
+  --color-warning: #d97706;
+  --color-error: #dc2626;
+  --color-info: #0284c7;
+
+  --color-brand-start: #ad46ff;
+  --color-brand-mid: #f6339a;
+  --color-brand-end: #ff6900;
+
+  --color-logo-start: #fb575d;
+  --color-logo-mid: #dc558b;
+  --color-logo-end: #b754c0;
+  --color-logo-dot: #ff3131;
+}
+
+.dark {
+  --color-bg: #09090b;
+  --color-surface: #18151c;
+  --color-surface-end: #1f1b24;
+  --color-border: #2e2a33;
+  --color-muted: #a1a1aa;
+  --color-text: #ffffff;
+}
+
+@keyframes workpunkt-logo-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.2;
+  }
 }
