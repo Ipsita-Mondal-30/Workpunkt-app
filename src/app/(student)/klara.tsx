@@ -1,5 +1,10 @@
-import { KlaraChatScreen } from "@/components/klara/klara-chat-screen";
+import { KlaraMatchingScreen } from "@/components/klara/klara-matching-screen";
 
 export default function StudentKlaraScreen() {
-  return <KlaraChatScreen subtitle="AI support for your study journey" />;
+  return (
+    <KlaraMatchingScreen
+      subtitle="Your AI counsellor — chat and free program matching"
+      requireStudentTarget={false}
+    />
+  );
 }

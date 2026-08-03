@@ -2,55 +2,76 @@ import { createClient } from "@supabase/supabase-js";
 import * as SecureStore from "expo-secure-store";
 import { Platform } from "react-native";
 
-const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL ?? "";
-const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? "";
+import { bootError, bootLog, bootWarn } from "@/lib/debug/boot-log";
+
+const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL?.trim() ?? "";
+const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY?.trim() ?? "";
+
+bootLog("supabase:init", {
+  platform: Platform.OS,
+  hasUrl: Boolean(supabaseUrl),
+  hasAnonKey: Boolean(supabaseAnonKey),
+  urlHost: supabaseUrl ? supabaseUrl.replace(/^https?:\/\//, "").split("/")[0] : null,
+});
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  bootError(
+    "supabase:missing-env",
+    "EXPO_PUBLIC_SUPABASE_URL / EXPO_PUBLIC_SUPABASE_ANON_KEY are missing. Auth will fail.",
+  );
+}
 
 const ExpoSecureStoreAdapter = {
-  getItem: (key: string) => {
-    if (Platform.OS === "web") {
-      try {
-        return Promise.resolve(
-          typeof localStorage !== "undefined" ? localStorage.getItem(key) : null,
-        );
-      } catch {
-        return Promise.resolve(null);
+  getItem: async (key: string) => {
+    try {
+      if (Platform.OS === "web") {
+        return typeof localStorage !== "undefined" ? localStorage.getItem(key) : null;
       }
+      return await SecureStore.getItemAsync(key);
+    } catch (error) {
+      bootWarn("supabase:storage:getItem", { key, error });
+      return null;
     }
-    return SecureStore.getItemAsync(key);
   },
-  setItem: (key: string, value: string) => {
-    if (Platform.OS === "web") {
-      try {
+  setItem: async (key: string, value: string) => {
+    try {
+      if (Platform.OS === "web") {
         if (typeof localStorage !== "undefined") {
           localStorage.setItem(key, value);
         }
-      } catch {
-        // ignore
+        return;
       }
-      return Promise.resolve();
+      await SecureStore.setItemAsync(key, value);
+    } catch (error) {
+      bootWarn("supabase:storage:setItem", { key, error });
     }
-    return SecureStore.setItemAsync(key, value);
   },
-  removeItem: (key: string) => {
-    if (Platform.OS === "web") {
-      try {
+  removeItem: async (key: string) => {
+    try {
+      if (Platform.OS === "web") {
         if (typeof localStorage !== "undefined") {
           localStorage.removeItem(key);
         }
-      } catch {
-        // ignore
+        return;
       }
-      return Promise.resolve();
+      await SecureStore.deleteItemAsync(key);
+    } catch (error) {
+      bootWarn("supabase:storage:removeItem", { key, error });
     }
-    return SecureStore.deleteItemAsync(key);
   },
 };
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    storage: ExpoSecureStoreAdapter,
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: false,
+export const supabase = createClient(
+  supabaseUrl || "https://placeholder.supabase.co",
+  supabaseAnonKey || "placeholder-anon-key",
+  {
+    auth: {
+      storage: ExpoSecureStoreAdapter,
+      autoRefreshToken: true,
+      persistSession: true,
+      detectSessionInUrl: false,
+    },
   },
-});
+);
+
+bootLog("supabase:client-created");

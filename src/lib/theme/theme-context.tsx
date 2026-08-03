@@ -11,6 +11,8 @@ import {
 import { useColorScheme as useNativeWindColorScheme } from "nativewind";
 import { Appearance } from "react-native";
 
+import { bootError, bootLog, bootWarn } from "@/lib/debug/boot-log";
+
 export type ThemePreference = "light" | "dark";
 
 export const THEME_STORAGE_KEY = "workpunkt-theme";
@@ -39,12 +41,14 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     (next: ThemePreference) => {
       setThemeState(next);
       setColorScheme(next);
+      bootLog("theme:applied", { theme: next });
     },
     [setColorScheme],
   );
 
   useEffect(() => {
     let mounted = true;
+    bootLog("theme:load-start");
 
     void (async () => {
       try {
@@ -55,11 +59,15 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         } else {
           applyTheme(resolveInitialTheme());
         }
+        bootLog("theme:load-ok", { stored });
       } catch (error) {
-        console.error("[theme] failed to load preference", error);
+        bootWarn("theme:load-failed — falling back to system", error);
         applyTheme(resolveInitialTheme());
       } finally {
-        if (mounted) setReady(true);
+        if (mounted) {
+          setReady(true);
+          bootLog("theme:ready");
+        }
       }
     })();
 
@@ -73,9 +81,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       applyTheme(next);
       try {
         await AsyncStorage.setItem(THEME_STORAGE_KEY, next);
-        console.log("[theme] saved", next);
+        bootLog("theme:saved", { theme: next });
       } catch (error) {
-        console.error("[theme] failed to save preference", error);
+        bootError("theme:save-failed", error);
       }
     },
     [applyTheme],

@@ -1,0 +1,26 @@
+export const queryKeys = {
+  matches: () => ["matches"] as const,
+  agentDashboard: () => ["agent", "dashboard"] as const,
+  agentStudents: () => ["agent", "students"] as const,
+  agentCommissions: () => ["agent", "commissions"] as const,
+  agentTraining: () => ["agent", "training"] as const,
+  agentResources: () => ["agent", "resources"] as const,
+  agentWebinars: () => ["agent", "webinars"] as const,
+  agentStudentPrograms: () => ["agent", "student-programs"] as const,
+  agentCareerPathing: () => ["agent", "career-pathing"] as const,
+  agentNotifications: () => ["agent", "notifications"] as const,
+  supportInbox: () => ["support", "inbox"] as const,
+  supportInboxAdmin: () => ["support", "inbox", "admin"] as const,
+  entitlementsMe: () => ["entitlements", "me"] as const,
+  adminUsersLeads: () => ["admin", "users-leads"] as const,
+  adminStudentPipeline: () => ["admin", "student-pipeline"] as const,
+  adminApplicationsOps: () => ["admin", "applications-ops"] as const,
+  adminAgentsPartners: () => ["admin", "agents-partners"] as const,
+  adminEmailLogs: (after?: string | null) =>
+    ["admin", "email-logs", after ?? "first"] as const,
+  adminEmailLog: (id: string) => ["admin", "email-logs", "detail", id] as const,
+  klaraQualifier: (studentEmail?: string) =>
+    ["klara", "qualifier", studentEmail ?? "self"] as const,
+  klaraMatches: (studentEmail?: string) =>
+    ["klara", "matches", studentEmail ?? "self"] as const,
+};

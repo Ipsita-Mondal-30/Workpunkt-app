@@ -4,6 +4,15 @@ import { useRouter } from "expo-router";
 import { GradientButton } from "@/components/shared/gradient-button";
 import { useAuth } from "@/lib/auth/auth-context";
 
+const SHORTCUTS = [
+  { label: "Users / Leads", href: "/(admin)/leads" },
+  { label: "Student Pipeline", href: "/(admin)/pipeline" },
+  { label: "Applications Ops", href: "/(admin)/applications-ops" },
+  { label: "Help & Chat", href: "/(admin)/help-chat" },
+  { label: "Agents & Partners", href: "/(admin)/agents-partners" },
+  { label: "Email Logs", href: "/(admin)/email-logs" },
+] as const;
+
 export default function AdminHome() {
   const { profile } = useAuth();
   const router = useRouter();
@@ -15,15 +24,14 @@ export default function AdminHome() {
         {profile?.name ? `Signed in as ${profile.name}` : "Operations overview"}
       </Text>
 
-      <View className="mt-8 gap-4">
-        <GradientButton
-          text="Student Pipeline"
-          onPress={() => router.push("/(admin)/pipeline")}
-        />
-        <GradientButton
-          text="Users / Leads"
-          onPress={() => router.push("/(admin)/leads")}
-        />
+      <View className="mt-8 gap-3">
+        {SHORTCUTS.map((item) => (
+          <GradientButton
+            key={item.href}
+            text={item.label}
+            onPress={() => router.push(item.href as never)}
+          />
+        ))}
       </View>
     </View>
   );

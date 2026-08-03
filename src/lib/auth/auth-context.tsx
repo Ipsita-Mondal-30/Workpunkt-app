@@ -15,6 +15,7 @@ import {
   type AppRole,
   type ProfileFlags,
 } from "@/lib/auth/resolve-role";
+import { bootError, bootLog, bootWarn } from "@/lib/debug/boot-log";
 import { supabase } from "@/lib/supabase/client";
 
 type AuthContextValue = {
@@ -35,6 +36,7 @@ type AuthContextValue = {
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 async function loadProfile(userId: string): Promise<ProfileFlags | null> {
+  bootLog("auth:loadProfile:start", { userId });
   const { data, error } = await supabase
     .from("profiles")
     .select("role, admin_role, name, email, is_agent_active")
@@ -42,10 +44,14 @@ async function loadProfile(userId: string): Promise<ProfileFlags | null> {
     .maybeSingle();
 
   if (error) {
-    console.error("[auth] loadProfile failed", error.message);
+    bootError("auth:loadProfile", error.message);
     return null;
   }
 
+  bootLog("auth:loadProfile:ok", {
+    role: data?.role ?? null,
+    adminRole: data?.admin_role ?? null,
+  });
   return (data as ProfileFlags | null) ?? null;
 }
 
@@ -55,6 +61,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   const applySession = useCallback(async (next: Session | null) => {
+    bootLog("auth:applySession", {
+      hasSession: Boolean(next),
+      userId: next?.user?.id ?? null,
+    });
     setSession(next);
     if (!next?.user) {
       setProfile(null);
@@ -63,56 +73,75 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const nextProfile = await loadProfile(next.user.id);
     setProfile(nextProfile);
     const role = resolveAppRole(nextProfile);
-    console.log("[auth] profile loaded", {
+    bootLog("auth:session-ready", {
       userId: next.user.id,
       email: next.user.email,
       role,
-      profileRole: nextProfile?.role,
-      adminRole: nextProfile?.admin_role,
+      homePath: roleHomePath(role),
     });
   }, []);
 
   useEffect(() => {
     let mounted = true;
+    bootLog("auth:provider-mounted");
 
     void (async () => {
-      console.log("[auth] restoring session…");
-      const {
-        data: { session: existing },
-      } = await supabase.auth.getSession();
-      if (!mounted) return;
-      await applySession(existing);
-      setLoading(false);
+      try {
+        bootLog("auth:getSession:start");
+        const {
+          data: { session: existing },
+          error,
+        } = await supabase.auth.getSession();
+        if (error) {
+          bootWarn("auth:getSession:error", error.message);
+        }
+        if (!mounted) return;
+        await applySession(existing);
+      } catch (error) {
+        bootError("auth:getSession:throw", error);
+      } finally {
+        if (mounted) {
+          setLoading(false);
+          bootLog("auth:loading-false");
+        }
+      }
     })();
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, next) => {
+    } = supabase.auth.onAuthStateChange((event, next) => {
+      bootLog("auth:onAuthStateChange", { event, hasSession: Boolean(next) });
       void (async () => {
-        await applySession(next);
-        setLoading(false);
+        try {
+          await applySession(next);
+        } catch (error) {
+          bootError("auth:onAuthStateChange:apply", error);
+        } finally {
+          setLoading(false);
+        }
       })();
     });
 
     return () => {
       mounted = false;
       subscription.unsubscribe();
+      bootLog("auth:provider-unmounted");
     };
   }, [applySession]);
 
   const signIn = useCallback(async (email: string, password: string) => {
-    console.log("[auth] signIn start", { email });
+    bootLog("auth:signIn:start", { email });
     const { data, error } = await supabase.auth.signInWithPassword({
       email: email.trim(),
       password,
     });
 
     if (error) {
-      console.error("[auth] signIn failed", error.message);
+      bootError("auth:signIn", error.message);
       return { error: error.message, role: null, homePath: "/(auth)/login" };
     }
 
-    console.log("[auth] signIn success", { userId: data.user?.id });
+    bootLog("auth:signIn:success", { userId: data.user?.id });
     await applySession(data.session);
 
     const nextProfile = data.session?.user
@@ -120,12 +149,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       : null;
     const nextRole = resolveAppRole(nextProfile);
     const nextHome = roleHomePath(nextRole);
-    console.log("[auth] post-login route", { role: nextRole, dest: nextHome });
+    bootLog("auth:signIn:route", { role: nextRole, dest: nextHome });
     return { error: null, role: nextRole, homePath: nextHome };
   }, [applySession]);
 
   const signOut = useCallback(async () => {
-    console.log("[auth] signOut");
+    bootLog("auth:signOut");
     await supabase.auth.signOut();
     setSession(null);
     setProfile(null);
