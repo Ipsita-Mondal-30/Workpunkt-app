@@ -11,6 +11,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { BootErrorBoundary } from "@/components/shared/boot-error-boundary";
 import { WorkpunktLoader } from "@/components/shared/workpunkt-loader";
 import { AuthProvider, useAuth } from "@/lib/auth/auth-context";
+import { useAuthDeepLinks } from "@/lib/auth/use-auth-deep-links";
 import { bootError, bootLog } from "@/lib/debug/boot-log";
 import { AppQueryProvider } from "@/lib/query/query-provider";
 import { ThemeProvider, useTheme } from "@/lib/theme/theme-context";
@@ -34,6 +35,7 @@ try {
 function RootNavigator() {
   const { loading, session, role, homePath } = useAuth();
   const { isDark, ready } = useTheme();
+  useAuthDeepLinks();
 
   bootLog("root-navigator:render", {
     authLoading: loading,

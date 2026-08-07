@@ -39,7 +39,7 @@ async function loadProfile(userId: string): Promise<ProfileFlags | null> {
   bootLog("auth:loadProfile:start", { userId });
   const { data, error } = await supabase
     .from("profiles")
-    .select("role, admin_role, name, email, is_agent_active")
+    .select("role, admin_role, name, email, is_agent_active, is_enrolled, needs_password_setup")
     .eq("id", userId)
     .maybeSingle();
 

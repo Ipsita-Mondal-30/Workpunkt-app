@@ -8,7 +8,12 @@
     "scheme": "workpunktapp",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "icon": "./assets/expo.icon",
+      "bundleIdentifier": "com.workpunkt.app",
+      "associatedDomains": [
+        "applinks:workpunkt.com",
+        "applinks:www.workpunkt.com"
+      ]
     },
     "android": {
       "adaptiveIcon": {
@@ -18,7 +23,36 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.avi_srivastava.workpunktapp"
+      "package": "com.avi_srivastava.workpunktapp",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "category": ["BROWSABLE", "DEFAULT"],
+          "data": [
+            {
+              "scheme": "https",
+              "host": "workpunkt.com",
+              "pathPrefix": "/auth"
+            },
+            {
+              "scheme": "https",
+              "host": "www.workpunkt.com",
+              "pathPrefix": "/auth"
+            },
+            {
+              "scheme": "https",
+              "host": "workpunkt.com",
+              "pathPrefix": "/agent/activate"
+            },
+            {
+              "scheme": "https",
+              "host": "www.workpunkt.com",
+              "pathPrefix": "/agent/activate"
+            }
+          ]
+        }
+      ]
     },
     "web": {
       "bundler": "metro",

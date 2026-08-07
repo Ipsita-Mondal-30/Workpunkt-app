@@ -6,6 +6,8 @@ export type ProfileFlags = {
   name: string | null;
   email: string | null;
   is_agent_active: boolean | null;
+  is_enrolled: boolean | null;
+  needs_password_setup: boolean | null;
 };
 
 /** Mirror website post-login priority: admin → counsellor → agent → student. */
