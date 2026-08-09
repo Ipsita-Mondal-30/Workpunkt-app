@@ -3,6 +3,7 @@ import { Pressable, Text, TextInput, View } from "react-native";
 import { useRouter } from "expo-router";
 
 import { SignupShell } from "@/components/auth/signup-shell";
+import { TermsPrivacyConsent } from "@/components/legal/terms-privacy-consent";
 import { GradientButton } from "@/components/shared/gradient-button";
 import { publicPostJson } from "@/lib/api/public-fetch";
 import { useTheme } from "@/lib/theme/theme-context";
@@ -21,13 +22,20 @@ export default function CounsellorSignupScreen() {
   const [intent, setIntent] = useState<"counsellor_access" | "career_pathing">(
     "counsellor_access",
   );
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [termsError, setTermsError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   async function onSubmit() {
     setError(null);
+    setTermsError(null);
     if (!fullName.trim() || !workEmail.trim() || !schoolName.trim()) {
       setError("Please fill in your name, email, and school name.");
+      return;
+    }
+    if (!termsAccepted) {
+      setTermsError("Please agree to the Terms and Conditions");
       return;
     }
 
@@ -129,12 +137,22 @@ export default function CounsellorSignupScreen() {
         placeholderTextColor={placeholderColor}
         value={whatsapp}
         onChangeText={setWhatsapp}
-        className="mb-6 rounded-2xl border border-border bg-surface px-4 py-4 text-base text-text"
+        className="mb-4 rounded-2xl border border-border bg-surface px-4 py-4 text-base text-text"
+      />
+
+      <TermsPrivacyConsent
+        checked={termsAccepted}
+        onCheckedChange={(value) => {
+          setTermsAccepted(value);
+          if (value) setTermsError(null);
+        }}
+        error={termsError}
       />
 
       <GradientButton
         text={loading ? "Submitting…" : "Submit application"}
         loading={loading}
+        disabled={!termsAccepted}
         onPress={() => void onSubmit()}
       />
     </SignupShell>

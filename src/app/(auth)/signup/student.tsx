@@ -3,6 +3,7 @@ import { Pressable, Text, TextInput, View } from "react-native";
 import { useRouter } from "expo-router";
 
 import { SignupShell } from "@/components/auth/signup-shell";
+import { TermsPrivacyConsent } from "@/components/legal/terms-privacy-consent";
 import { GradientButton } from "@/components/shared/gradient-button";
 import { publicPostJson } from "@/lib/api/public-fetch";
 import { savePrivateDraft } from "@/lib/signup/private-draft";
@@ -33,13 +34,20 @@ export default function StudentSignupScreen() {
   const [email, setEmail] = useState("");
   const [mobile, setMobile] = useState("");
   const [source, setSource] = useState("");
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [termsError, setTermsError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   async function onSubmit() {
     setError(null);
+    setTermsError(null);
     if (!firstName.trim() || !email.trim() || !mobile.trim() || !source) {
       setError("Please fill in all required fields.");
+      return;
+    }
+    if (!termsAccepted) {
+      setTermsError("Please agree to the Terms and Conditions");
       return;
     }
 
@@ -134,9 +142,19 @@ export default function StudentSignupScreen() {
         ))}
       </View>
 
+      <TermsPrivacyConsent
+        checked={termsAccepted}
+        onCheckedChange={(value) => {
+          setTermsAccepted(value);
+          if (value) setTermsError(null);
+        }}
+        error={termsError}
+      />
+
       <GradientButton
         text={loading ? "Submitting…" : "Continue"}
         loading={loading}
+        disabled={!termsAccepted}
         onPress={() => void onSubmit()}
       />
     </SignupShell>

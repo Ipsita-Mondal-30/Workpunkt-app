@@ -3,6 +3,7 @@ import { Pressable, Text, TextInput, View } from "react-native";
 import { useRouter } from "expo-router";
 
 import { SignupShell } from "@/components/auth/signup-shell";
+import { TermsPrivacyConsent } from "@/components/legal/terms-privacy-consent";
 import { GradientButton } from "@/components/shared/gradient-button";
 import { publicPostJson } from "@/lib/api/public-fetch";
 import { useTheme } from "@/lib/theme/theme-context";
@@ -66,6 +67,8 @@ export default function AgentSignupScreen() {
   const [sourcingIds, setSourcingIds] = useState<string[]>([]);
   const [teamSize, setTeamSize] = useState("");
   const [whyWorkpunkt, setWhy] = useState("");
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [termsError, setTermsError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -101,12 +104,17 @@ export default function AgentSignupScreen() {
 
   async function submit() {
     setError(null);
+    setTermsError(null);
     if (!annualStudentsRecruited || !countriesRecruitedFor || !teamSize || !whyWorkpunkt.trim()) {
       setError("Please complete all step 2 fields.");
       return;
     }
     if (sourcingIds.length === 0) {
       setError("Select at least one sourcing method.");
+      return;
+    }
+    if (!termsAccepted) {
+      setTermsError("Please agree to the Terms and Conditions");
       return;
     }
 
@@ -312,12 +320,22 @@ export default function AgentSignupScreen() {
             multiline
             value={whyWorkpunkt}
             onChangeText={setWhy}
-            className="mb-6 min-h-[100px] rounded-2xl border border-border bg-surface px-4 py-4 text-base text-text"
+            className="mb-4 min-h-[100px] rounded-2xl border border-border bg-surface px-4 py-4 text-base text-text"
+          />
+
+          <TermsPrivacyConsent
+            checked={termsAccepted}
+            onCheckedChange={(value) => {
+              setTermsAccepted(value);
+              if (value) setTermsError(null);
+            }}
+            error={termsError}
           />
 
           <GradientButton
             text={loading ? "Submitting…" : "Submit application"}
             loading={loading}
+            disabled={!termsAccepted}
             onPress={() => void submit()}
           />
         </>
