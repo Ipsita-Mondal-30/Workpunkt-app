@@ -2,9 +2,19 @@ import { useEffect, useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
 import { useRouter } from "expo-router";
 
+import { OptionSelect } from "@/components/auth/option-select";
+import { SignupField, signupInputClass } from "@/components/auth/signup-field";
 import { SignupShell } from "@/components/auth/signup-shell";
 import { GradientButton } from "@/components/shared/gradient-button";
 import { publicPostJson } from "@/lib/api/public-fetch";
+import { studentAcademicCopy } from "@/lib/signup/copy";
+import {
+  PRIVATE_BOARD_OPTIONS,
+  PRIVATE_INTAKE_FORM_OPTIONS,
+  PRIVATE_LANGUAGE_CERT_OPTIONS,
+  PRIVATE_QUALIFICATION_OPTIONS,
+  PRIVATE_STUDY_LEVEL_OPTIONS,
+} from "@/lib/signup/form-options";
 import {
   loadPrivateDraft,
   savePrivateDraft,
@@ -13,124 +23,79 @@ import {
 import { useTheme } from "@/lib/theme/theme-context";
 import { cn } from "@/lib/utils";
 
-const QUALIFICATIONS = [
-  { value: "class-10", label: "Class 10 / Secondary School" },
-  { value: "class-12", label: "Class 12 / High School (in progress)" },
-  { value: "class-12-completed", label: "Class 12 / High School (completed)" },
-  { value: "bachelors-in-progress", label: "Bachelor's degree (in progress)" },
-  { value: "bachelors-completed", label: "Bachelor's degree (completed)" },
-  { value: "masters-in-progress", label: "Master's degree (in progress)" },
-  { value: "masters-completed", label: "Master's degree (completed)" },
-];
+const EMPTY_FORM: PrivateAcademicDraft = {
+  qualification: "",
+  institution: "",
+  year: "",
+  grade: "",
+  boards: "",
+  boardsOther: "",
+  studyGoal: "",
+  studyLevel: "",
+  languageCert: "",
+  intake: "",
+};
 
-const STUDY_LEVELS = [
-  { value: "bachelors", label: "Bachelor's" },
-  { value: "masters", label: "Master's" },
-  { value: "fully-funded-phd", label: "Fully Funded PhD" },
-  { value: "ausbildung", label: "Ausbildung" },
-  { value: "chancenkarte", label: "Chancenkarte" },
-  { value: "paid-internships", label: "Paid Internships" },
-];
-
-const LANGUAGE = [
-  { value: "ielts", label: "IELTS" },
-  { value: "toefl", label: "TOEFL" },
-  { value: "yet-to-appear", label: "Yet to appear" },
-  { value: "others", label: "Others" },
-];
-
-const BOARDS = [
-  { value: "cbse-state", label: "CBSE/State Boards" },
-  { value: "icse-isc", label: "ICSE/ISC" },
-  { value: "ibdp", label: "IBDP" },
-  { value: "cambridge-a-levels", label: "Cambridge A-levels" },
-  { value: "nios", label: "NIOS" },
-  { value: "others", label: "Others" },
-];
-
-const INTAKES = [
-  { value: "winter-2026", label: "Winter 2026" },
-  { value: "summer-2027", label: "Summer 2027" },
-];
-
-function ChipRow({
-  options,
-  value,
-  onChange,
-}: {
-  options: Array<{ value: string; label: string }>;
-  value: string;
-  onChange: (value: string) => void;
-}) {
-  return (
-    <View className="mb-4 flex-row flex-wrap gap-2">
-      {options.map((option) => (
-        <Pressable
-          key={option.value}
-          onPress={() => onChange(option.value)}
-          className={cn(
-            "rounded-lg border px-3 py-2",
-            value === option.value
-              ? "border-brand-mid bg-brand-mid/15"
-              : "border-border bg-surface",
-          )}
-        >
-          <Text className="text-xs text-text">{option.label}</Text>
-        </Pressable>
-      ))}
-    </View>
-  );
-}
+type FieldErrors = Partial<Record<keyof PrivateAcademicDraft, string>>;
 
 export default function StudentAcademicScreen() {
   const router = useRouter();
   const { isDark } = useTheme();
   const placeholderColor = isDark ? "#a1a1aa" : "#71717a";
-  const [form, setForm] = useState<PrivateAcademicDraft>({
-    qualification: "",
-    institution: "",
-    year: "",
-    grade: "",
-    boards: "",
-    boardsOther: "",
-    studyGoal: "",
-    studyLevel: "",
-    languageCert: "",
-    intake: "",
-  });
+  const copy = studentAcademicCopy;
+  const [form, setForm] = useState<PrivateAcademicDraft>(EMPTY_FORM);
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [deferring, setDeferring] = useState(false);
 
   useEffect(() => {
     void loadPrivateDraft().then((draft) => {
-      if (draft?.academic) setForm(draft.academic);
+      if (draft?.academic) setForm({ ...EMPTY_FORM, ...draft.academic });
     });
   }, []);
 
   function patch(partial: Partial<PrivateAcademicDraft>) {
     setForm((prev) => ({ ...prev, ...partial }));
+    setFieldErrors((prev) => {
+      const next = { ...prev };
+      for (const key of Object.keys(partial) as Array<keyof PrivateAcademicDraft>) {
+        delete next[key];
+      }
+      return next;
+    });
+  }
+
+  function validate(): FieldErrors | null {
+    const next: FieldErrors = {};
+    if (!form.qualification) {
+      next.qualification = "Select your current or most recent qualification from the list.";
+    }
+    if (!form.institution.trim()) next.institution = "Enter your school or college name.";
+    if (!form.year.trim()) {
+      next.year = "Enter the year of completion or expected completion.";
+    } else if (!/^\d{4}$/.test(form.year.trim())) {
+      next.year = "Use a four-digit year, for example 2025.";
+    }
+    if (!form.grade.trim()) next.grade = "Enter your percentage or CGPA.";
+    if (!form.boards) next.boards = "Select your board from the list.";
+    if (form.boards === "others" && !form.boardsOther?.trim()) {
+      next.boardsOther = "Enter your board name.";
+    }
+    if (!form.studyGoal.trim()) {
+      next.studyGoal = "Tell us what you would like to study in Germany.";
+    }
+    if (!form.studyLevel) next.studyLevel = "Select your preferred study level.";
+    if (!form.languageCert) next.languageCert = "Select whether you have a language certificate.";
+    if (!form.intake) next.intake = "Select a target intake from the list.";
+    return Object.keys(next).length > 0 ? next : null;
   }
 
   async function onSubmit() {
     setError(null);
-    if (
-      !form.qualification ||
-      !form.institution.trim() ||
-      !form.year.trim() ||
-      !form.grade.trim() ||
-      !form.boards ||
-      !form.studyGoal.trim() ||
-      !form.studyLevel ||
-      !form.languageCert ||
-      !form.intake
-    ) {
-      setError("Please complete all required academic fields.");
-      return;
-    }
-    if (form.boards === "others" && !form.boardsOther?.trim()) {
-      setError("Enter your board name.");
-      return;
-    }
+    const nextErrors = validate();
+    setFieldErrors(nextErrors ?? {});
+    if (nextErrors) return;
 
     const draft = await loadPrivateDraft();
     if (!draft?.signup) {
@@ -138,18 +103,26 @@ export default function StudentAcademicScreen() {
       return;
     }
 
+    const academic: PrivateAcademicDraft = {
+      ...form,
+      institution: form.institution.trim(),
+      year: form.year.trim(),
+      grade: form.grade.trim(),
+      studyGoal: form.studyGoal.trim(),
+      boardsOther: form.boards === "others" ? form.boardsOther?.trim() ?? "" : "",
+    };
+
     setLoading(true);
     try {
       await publicPostJson("/api/private/applications/draft", {
         signup: draft.signup,
-        academic: form,
-        reference: draft.reference,
+        academic,
+        ...(draft.reference?.trim() ? { reference: draft.reference.trim() } : {}),
       });
-      await savePrivateDraft({ ...draft, academic: form });
+      await savePrivateDraft({ ...draft, academic });
       router.push("/(auth)/signup/student/upload");
     } catch (err) {
-      // Still allow local continue if draft sync fails (same as website).
-      await savePrivateDraft({ ...draft, academic: form });
+      await savePrivateDraft({ ...draft, academic });
       setError(err instanceof Error ? err.message : "Could not sync draft.");
       router.push("/(auth)/signup/student/upload");
     } finally {
@@ -157,10 +130,37 @@ export default function StudentAcademicScreen() {
     }
   }
 
+  async function onDefer() {
+    setError(null);
+    const draft = await loadPrivateDraft();
+    if (!draft?.signup) {
+      setError("Signup details missing. Start again from student sign up.");
+      return;
+    }
+
+    setDeferring(true);
+    try {
+      await publicPostJson("/api/private/applications/defer", {
+        signup: {
+          ...draft.signup,
+          source: draft.signup.source.trim() || "Website",
+        },
+        ...(draft.reference?.trim() ? { reference: draft.reference.trim() } : {}),
+      });
+      router.replace("/(auth)/login");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to save your profile. Please try again.");
+    } finally {
+      setDeferring(false);
+    }
+  }
+
+  const busy = loading || deferring;
+
   return (
     <SignupShell
-      title="Academic background"
-      subtitle="Tell us about your studies so we can match programmes."
+      title={copy.title}
+      subtitle={copy.subtitle}
       backHref="/(auth)/signup/student/check-email"
     >
       {error ? (
@@ -169,78 +169,131 @@ export default function StudentAcademicScreen() {
         </View>
       ) : null}
 
-      <Text className="mb-2 text-xs font-semibold uppercase text-muted">Qualification</Text>
-      <ChipRow
-        options={QUALIFICATIONS}
-        value={form.qualification}
-        onChange={(qualification) => patch({ qualification })}
-      />
-
-      <TextInput
-        placeholder="School / college"
-        placeholderTextColor={placeholderColor}
-        value={form.institution}
-        onChangeText={(institution) => patch({ institution })}
-        className="mb-3 rounded-2xl border border-border bg-surface px-4 py-4 text-base text-text"
-      />
-      <TextInput
-        placeholder="Year (YYYY)"
-        placeholderTextColor={placeholderColor}
-        keyboardType="number-pad"
-        value={form.year}
-        onChangeText={(year) => patch({ year })}
-        className="mb-3 rounded-2xl border border-border bg-surface px-4 py-4 text-base text-text"
-      />
-      <TextInput
-        placeholder="Percentage / CGPA"
-        placeholderTextColor={placeholderColor}
-        value={form.grade}
-        onChangeText={(grade) => patch({ grade })}
-        className="mb-3 rounded-2xl border border-border bg-surface px-4 py-4 text-base text-text"
-      />
-
-      <Text className="mb-2 text-xs font-semibold uppercase text-muted">Board</Text>
-      <ChipRow options={BOARDS} value={form.boards} onChange={(boards) => patch({ boards })} />
-      {form.boards === "others" ? (
-        <TextInput
-          placeholder="Board name"
-          placeholderTextColor={placeholderColor}
-          value={form.boardsOther}
-          onChangeText={(boardsOther) => patch({ boardsOther })}
-          className="mb-3 rounded-2xl border border-border bg-surface px-4 py-4 text-base text-text"
+      <SignupField
+        label={copy.fields.qualification.label}
+        error={fieldErrors.qualification}
+        hint={copy.fields.qualification.hint}
+      >
+        <OptionSelect
+          value={form.qualification}
+          placeholder={copy.fields.qualification.placeholder}
+          options={PRIVATE_QUALIFICATION_OPTIONS}
+          onChange={(qualification) => patch({ qualification })}
+          hasError={Boolean(fieldErrors.qualification)}
+          disabled={busy}
         />
-      ) : null}
+      </SignupField>
 
-      <TextInput
-        placeholder="What would you like to study in Germany?"
-        placeholderTextColor={placeholderColor}
-        value={form.studyGoal}
-        onChangeText={(studyGoal) => patch({ studyGoal })}
-        className="mb-3 rounded-2xl border border-border bg-surface px-4 py-4 text-base text-text"
-      />
+      <SignupField label={copy.fields.institution.label} error={fieldErrors.institution}>
+        <TextInput
+          placeholder={copy.fields.institution.placeholder}
+          placeholderTextColor={placeholderColor}
+          value={form.institution}
+          editable={!busy}
+          onChangeText={(institution: string) => patch({ institution })}
+          className={signupInputClass(Boolean(fieldErrors.institution))}
+        />
+      </SignupField>
 
-      <Text className="mb-2 text-xs font-semibold uppercase text-muted">Study level</Text>
-      <ChipRow
-        options={STUDY_LEVELS}
-        value={form.studyLevel}
-        onChange={(studyLevel) => patch({ studyLevel })}
-      />
+      <SignupField label={copy.fields.year.label} error={fieldErrors.year} hint={copy.fields.year.hint}>
+        <TextInput
+          placeholder={copy.fields.year.placeholder}
+          placeholderTextColor={placeholderColor}
+          keyboardType="number-pad"
+          value={form.year}
+          editable={!busy}
+          onChangeText={(year: string) => patch({ year })}
+          className={signupInputClass(Boolean(fieldErrors.year))}
+        />
+      </SignupField>
 
-      <Text className="mb-2 text-xs font-semibold uppercase text-muted">Language cert</Text>
-      <ChipRow
-        options={LANGUAGE}
-        value={form.languageCert}
-        onChange={(languageCert) => patch({ languageCert })}
-      />
+      <SignupField label={copy.fields.grade.label} error={fieldErrors.grade}>
+        <TextInput
+          placeholder={copy.fields.grade.placeholder}
+          placeholderTextColor={placeholderColor}
+          value={form.grade}
+          editable={!busy}
+          onChangeText={(grade: string) => patch({ grade })}
+          className={signupInputClass(Boolean(fieldErrors.grade))}
+        />
+      </SignupField>
 
-      <Text className="mb-2 text-xs font-semibold uppercase text-muted">Target intake</Text>
-      <ChipRow options={INTAKES} value={form.intake} onChange={(intake) => patch({ intake })} />
+      <SignupField label={copy.fields.boards.label} error={fieldErrors.boards ?? fieldErrors.boardsOther}>
+        <OptionSelect
+          value={form.boards}
+          placeholder={copy.fields.boards.placeholder}
+          options={PRIVATE_BOARD_OPTIONS}
+          onChange={(boards) => patch({ boards, boardsOther: boards === "others" ? form.boardsOther : "" })}
+          hasError={Boolean(fieldErrors.boards || fieldErrors.boardsOther)}
+          disabled={busy}
+        />
+        {form.boards === "others" ? (
+          <TextInput
+            placeholder={copy.fields.boardsOther.placeholder}
+            placeholderTextColor={placeholderColor}
+            value={form.boardsOther}
+            editable={!busy}
+            onChangeText={(boardsOther: string) => patch({ boardsOther })}
+            className={cn(signupInputClass(Boolean(fieldErrors.boardsOther)), "mt-2")}
+          />
+        ) : null}
+      </SignupField>
+
+      <SignupField label={copy.fields.studyGoal.label} error={fieldErrors.studyGoal}>
+        <TextInput
+          placeholder={copy.fields.studyGoal.placeholder}
+          placeholderTextColor={placeholderColor}
+          value={form.studyGoal}
+          editable={!busy}
+          onChangeText={(studyGoal: string) => patch({ studyGoal })}
+          className={signupInputClass(Boolean(fieldErrors.studyGoal))}
+        />
+      </SignupField>
+
+      <SignupField label={copy.fields.studyLevel.label} error={fieldErrors.studyLevel}>
+        <OptionSelect
+          value={form.studyLevel}
+          placeholder={copy.fields.studyLevel.placeholder}
+          options={PRIVATE_STUDY_LEVEL_OPTIONS}
+          onChange={(studyLevel) => patch({ studyLevel })}
+          hasError={Boolean(fieldErrors.studyLevel)}
+          disabled={busy}
+        />
+      </SignupField>
+
+      <SignupField label={copy.fields.languageCert.label} error={fieldErrors.languageCert}>
+        <OptionSelect
+          value={form.languageCert}
+          placeholder={copy.fields.languageCert.placeholder}
+          options={PRIVATE_LANGUAGE_CERT_OPTIONS}
+          onChange={(languageCert) => patch({ languageCert })}
+          hasError={Boolean(fieldErrors.languageCert)}
+          disabled={busy}
+        />
+      </SignupField>
+
+      <SignupField label={copy.fields.intake.label} error={fieldErrors.intake} hint={copy.fields.intake.hint}>
+        <OptionSelect
+          value={form.intake}
+          placeholder={copy.fields.intake.placeholder}
+          options={PRIVATE_INTAKE_FORM_OPTIONS}
+          onChange={(intake) => patch({ intake })}
+          hasError={Boolean(fieldErrors.intake)}
+          disabled={busy}
+        />
+      </SignupField>
 
       <GradientButton
-        text={loading ? "Saving…" : "Continue to documents"}
+        text={loading ? "Saving…" : copy.submit}
         loading={loading}
+        disabled={busy}
         onPress={() => void onSubmit()}
       />
+      <Pressable disabled={busy} onPress={() => void onDefer()} className="mt-4 py-2">
+        <Text className="text-center text-sm font-semibold text-brand-mid">
+          {deferring ? "Saving…" : copy.skip}
+        </Text>
+      </Pressable>
     </SignupShell>
   );
 }

@@ -7,21 +7,9 @@ import { SignupShell } from "@/components/auth/signup-shell";
 import { GradientButton } from "@/components/shared/gradient-button";
 import { getAccessToken } from "@/lib/api/auth-fetch";
 import { publicPostJson } from "@/lib/api/public-fetch";
-import {
-  clearPrivateDraft,
-  loadPrivateDraft,
-} from "@/lib/signup/private-draft";
-
-const REQUIRED = [
-  { id: "marksheets", label: "Marksheets" },
-  { id: "passport", label: "Passport" },
-  { id: "photograph", label: "Photograph" },
-] as const;
-
-const OPTIONAL = [
-  { id: "cv", label: "CV" },
-  { id: "language", label: "Language certificate" },
-] as const;
+import { studentUploadCopy } from "@/lib/signup/copy";
+import { PRIVATE_OPTIONAL_DOCUMENTS, PRIVATE_REQUIRED_DOCUMENTS } from "@/lib/signup/form-options";
+import { clearPrivateDraft, loadPrivateDraft } from "@/lib/signup/private-draft";
 
 type PickedDoc = { id: string; fileName: string; uri: string; mimeType?: string };
 
@@ -30,8 +18,11 @@ const apiBase = (process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:3000").rep
   "",
 );
 
+const ALL_DOCUMENTS = [...PRIVATE_REQUIRED_DOCUMENTS, ...PRIVATE_OPTIONAL_DOCUMENTS];
+
 export default function StudentUploadScreen() {
   const router = useRouter();
+  const copy = studentUploadCopy;
   const [docs, setDocs] = useState<Record<string, PickedDoc>>({});
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -40,6 +31,7 @@ export default function StudentUploadScreen() {
     const result = await DocumentPicker.getDocumentAsync({
       copyToCacheDirectory: true,
       multiple: false,
+      type: ["application/pdf", "image/jpeg", "image/jpg", "image/png"],
     });
     if (result.canceled || !result.assets?.[0]) return;
     const asset = result.assets[0];
@@ -89,9 +81,12 @@ export default function StudentUploadScreen() {
       return;
     }
 
-    for (const required of REQUIRED) {
-      if (!docs[required.id] && !incomplete) {
-        setError(`Please upload ${required.label}.`);
+    if (!incomplete) {
+      const missing = PRIVATE_REQUIRED_DOCUMENTS.filter((doc) => !docs[doc.id]).map(
+        (doc) => doc.title,
+      );
+      if (missing.length > 0) {
+        setError(`Please upload required documents before submitting: ${missing.join(", ")}.`);
         return;
       }
     }
@@ -131,8 +126,8 @@ export default function StudentUploadScreen() {
 
   return (
     <SignupShell
-      title="Upload documents"
-      subtitle="Required: marksheets, passport, and photograph."
+      title={copy.title}
+      subtitle={copy.subtitle}
       backHref="/(auth)/signup/student/academic"
     >
       {error ? (
@@ -141,26 +136,31 @@ export default function StudentUploadScreen() {
         </View>
       ) : null}
 
-      {[...REQUIRED, ...OPTIONAL].map((doc) => (
+      {ALL_DOCUMENTS.map((doc) => (
         <Pressable
           key={doc.id}
           onPress={() => void pick(doc.id)}
           className="mb-3 rounded-2xl border border-border bg-surface px-4 py-4"
         >
-          <Text className="text-sm font-semibold text-text">{doc.label}</Text>
+          <Text className="text-sm font-semibold text-text">{doc.title}</Text>
           <Text className="mt-1 text-xs text-muted">
-            {docs[doc.id]?.fileName ?? "Tap to choose a file"}
+            {docs[doc.id]?.fileName ?? (doc.hint || "Tap to choose a file")}
           </Text>
         </Pressable>
       ))}
 
+      <View className="mb-6 rounded-2xl border border-border bg-surface px-4 py-4">
+        <Text className="text-sm font-semibold text-text">{copy.missingNoteBold}</Text>
+        <Text className="mt-1 text-sm text-muted">{copy.missingNoteBody}</Text>
+      </View>
+
       <GradientButton
-        text={loading ? "Submitting…" : "Submit application"}
+        text={loading ? "Submitting…" : copy.submit}
         loading={loading}
         onPress={() => void onSubmit(false)}
       />
-      <View className="h-3" />
       <Pressable
+        className="mt-4 py-2"
         onPress={() =>
           Alert.alert(
             "Submit incomplete?",
@@ -173,7 +173,7 @@ export default function StudentUploadScreen() {
         }
       >
         <Text className="text-center text-sm font-semibold text-brand-mid">
-          Submit incomplete
+          {copy.submitIncomplete}
         </Text>
       </Pressable>
     </SignupShell>

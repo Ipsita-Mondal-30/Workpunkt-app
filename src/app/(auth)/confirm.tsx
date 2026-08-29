@@ -4,6 +4,7 @@ import { ActivityIndicator, Text, View } from "react-native";
 import type { EmailOtpType } from "@supabase/supabase-js";
 
 import { SignupShell } from "@/components/auth/signup-shell";
+import { GradientButton } from "@/components/shared/gradient-button";
 import { mapAuthNextPath } from "@/lib/auth/deep-link";
 import { useAuth } from "@/lib/auth/auth-context";
 import { supabase } from "@/lib/supabase/client";
@@ -54,8 +55,14 @@ export default function AuthConfirmScreen() {
   return (
     <SignupShell title="Signing you in" subtitle="Verifying your secure link…" backHref="/(auth)/login">
       {error ? (
-        <View className="rounded-2xl bg-error/10 px-4 py-3">
-          <Text className="text-sm text-error">{error}</Text>
+        <View>
+          <View className="mb-4 rounded-2xl bg-error/10 px-4 py-3">
+            <Text className="text-sm text-error">{error}</Text>
+          </View>
+          <GradientButton
+            text="Continue application"
+            onPress={() => router.replace("/(auth)/signup/student/academic")}
+          />
         </View>
       ) : (
         <View className="items-center py-10">

@@ -7,13 +7,13 @@ const ROLES = [
   {
     key: "student",
     title: "Student",
-    body: "Apply to private universities and get matched with programmes in Germany.",
+    body: "Create a free account and apply to private universities in Germany.",
     href: "/(auth)/signup/student",
   },
   {
     key: "agent",
     title: "Agent / Partner",
-    body: "Apply to become a Workpunkt recruitment partner.",
+    body: "Become a Workpunkt Partner and recruit students for German universities.",
     href: "/(auth)/signup/agent",
   },
   {

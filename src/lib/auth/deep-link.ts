@@ -74,3 +74,14 @@ export function parseAuthLinkUrl(url: string): {
 
   return { kind: "unknown" };
 }
+
+/**
+ * Website signup returns a same-origin continue path such as
+ * `/auth/confirm?token_hash=…&type=magiclink&next=/private/application/academic`.
+ */
+export function parseSignupContinueUrl(continueUrl: string | null | undefined) {
+  const value = continueUrl?.trim() ?? "";
+  if (!value.startsWith("/")) return { kind: "unknown" as const };
+
+  return parseAuthLinkUrl(`https://workpunkt.com${value}`);
+}
