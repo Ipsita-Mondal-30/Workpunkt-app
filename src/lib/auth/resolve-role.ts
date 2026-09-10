@@ -34,7 +34,7 @@ export function roleHomePath(role: AppRole): string {
     case "agent":
       return "/(agent)";
     case "counsellor":
-      return "/(counsellor)";
+      return "/(counsellor)/(tabs)";
     case "student":
     default:
       return "/(student)";

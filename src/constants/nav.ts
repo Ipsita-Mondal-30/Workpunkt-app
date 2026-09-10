@@ -36,21 +36,26 @@ export const ROLE_NAV: Record<AppRole, NavItem[]> = {
     { label: "Settings", href: "/(agent)/settings" },
   ],
   counsellor: [
-    { label: "Home", href: "/(counsellor)" },
-    { label: "Career Pathing", href: "/(counsellor)/career-pathing" },
-    { label: "Roadmaps", href: "/(counsellor)/roadmaps" },
-    { label: "CP Resources", href: "/(counsellor)/cp-resources" },
-    { label: "Quota", href: "/(counsellor)/quota" },
-    { label: "Prospects", href: "/(counsellor)/prospects" },
-    { label: "Rewards", href: "/(counsellor)/rewards" },
-    { label: "My Students", href: "/(counsellor)/students" },
-    { label: "Student Programs", href: "/(counsellor)/student-programs" },
-    { label: "Resources", href: "/(counsellor)/resources" },
-    { label: "Ask Klara", href: "/(counsellor)/klara" },
-    { label: "Message Team", href: "/(counsellor)/message-team" },
-    { label: "Settings", href: "/(counsellor)/settings" },
+    { label: "Dashboard", href: "/(counsellor)/(tabs)" },
+    { label: "My Students", href: "/(counsellor)/(tabs)/students" },
+    { label: "Student Programs", href: "/(counsellor)/(tabs)/more/student-programs" },
+    { label: "Payments", href: "/(counsellor)/(tabs)/more/payments" },
+    { label: "Training Hub", href: "/(counsellor)/(tabs)/training" },
+    { label: "Resource Hub", href: "/(counsellor)/(tabs)/resources" },
+    { label: "Ask Klara", href: "/(counsellor)/(tabs)/more/klara" },
+    { label: "Message Team", href: "/(counsellor)/(tabs)/more/support" },
+    { label: "Settings", href: "/(counsellor)/(tabs)/more/settings" },
   ],
 };
+
+/** Injected into counsellor drawer when Career Pathing is active (website sidebar parity). */
+export const COUNSELLOR_CP_NAV: NavItem[] = [
+  { label: "Career Pathing", href: "/(counsellor)/(tabs)/more/career-pathing" },
+  { label: "Student Roadmaps", href: "/(counsellor)/(tabs)/more/roadmaps" },
+  { label: "Quota & Prospects", href: "/(counsellor)/(tabs)/more/prospects" },
+  { label: "Placement Rewards", href: "/(counsellor)/(tabs)/more/placement-rewards" },
+];
+
 
 export const ROLE_TITLE: Record<AppRole, string> = {
   student: "Student",

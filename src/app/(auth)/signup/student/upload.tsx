@@ -13,7 +13,7 @@ import { clearPrivateDraft, loadPrivateDraft } from "@/lib/signup/private-draft"
 
 type PickedDoc = { id: string; fileName: string; uri: string; mimeType?: string };
 
-const apiBase = (process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:3000").replace(
+const apiBase = (process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:3001").replace(
   /\/$/,
   "",
 );

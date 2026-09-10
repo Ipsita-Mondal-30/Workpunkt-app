@@ -253,14 +253,25 @@ export default function AdminAgentsPartnersScreen() {
             />
 
             <Text className="mb-2 mt-5 text-sm font-semibold text-text">
-              School counsellors
+              School counsellor applications
             </Text>
             <HorizontalDataTable
               columns={counsellorColumns}
-              rows={data.schoolCounsellors}
+              rows={data.schoolCounsellors.filter((row) => row.reviewStatus === "pending")}
               keyExtractor={(row) => row.id}
               onRowPress={(row) => setSelected({ kind: "counsellor", row })}
-              emptyLabel="No counsellors."
+              emptyLabel="No pending school counsellor applications."
+            />
+
+            <Text className="mb-2 mt-5 text-sm font-semibold text-text">
+              Approved school counsellors
+            </Text>
+            <HorizontalDataTable
+              columns={counsellorColumns}
+              rows={data.schoolCounsellors.filter((row) => row.reviewStatus !== "pending")}
+              keyExtractor={(row) => row.id}
+              onRowPress={(row) => setSelected({ kind: "counsellor", row })}
+              emptyLabel="No approved school counsellors."
             />
           </>
         )}

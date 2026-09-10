@@ -3,6 +3,7 @@ import { Slot, Redirect } from "expo-router";
 import { RoleShell } from "@/components/layout/role-shell";
 import { WorkpunktLoader } from "@/components/shared/workpunkt-loader";
 import { useAuth } from "@/lib/auth/auth-context";
+import { CounsellorProvider } from "@/lib/counsellor/use-counsellor-context";
 
 export default function CounsellorLayout() {
   const { loading, session, role, homePath } = useAuth();
@@ -12,8 +13,10 @@ export default function CounsellorLayout() {
   if (role !== "counsellor") return <Redirect href={homePath as never} />;
 
   return (
-    <RoleShell role="counsellor" title="Counsellor">
-      <Slot />
-    </RoleShell>
+    <CounsellorProvider>
+      <RoleShell role="counsellor" title="Counsellor">
+        <Slot />
+      </RoleShell>
+    </CounsellorProvider>
   );
 }

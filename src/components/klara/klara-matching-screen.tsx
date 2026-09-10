@@ -13,6 +13,7 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 
 import { GradientButton } from "@/components/shared/gradient-button";
+import { KlaraAvatar } from "@/components/shared/klara-avatar";
 import { authFetch } from "@/lib/api/auth-fetch";
 import { QUALIFIER_QUESTIONS } from "@/lib/klara/qualifier-questions";
 import { queryKeys } from "@/lib/query/keys";
@@ -316,14 +317,17 @@ export function KlaraMatchingScreen({
     >
       <View className="border-b border-border px-4 py-3">
         <View className="flex-row items-start justify-between gap-3">
-          <View className="flex-1">
-            <Text className="text-2xl font-bold text-text">Ask Klara</Text>
-            <Text className="mt-1 text-sm text-muted">
-              {subtitle ||
-                (studentName
-                  ? `Helping ${studentName}${studentEmail ? ` · ${studentEmail}` : ""}`
-                  : "AI chat + program matching")}
-            </Text>
+          <View className="flex-1 flex-row items-start gap-3">
+            <KlaraAvatar size={40} alt="" />
+            <View className="flex-1">
+              <Text className="text-2xl font-bold text-text">Ask Klara</Text>
+              <Text className="mt-1 text-sm text-muted">
+                {subtitle ||
+                  (studentName
+                    ? `Helping ${studentName}${studentEmail ? ` · ${studentEmail}` : ""}`
+                    : "AI chat + program matching")}
+              </Text>
+            </View>
           </View>
           {requireStudentTarget && hasTarget ? (
             <Pressable onPress={onClearStudent} className="rounded-xl bg-surface-end px-3 py-2">
@@ -362,17 +366,26 @@ export function KlaraMatchingScreen({
             contentContainerClassName="py-4 gap-3"
             renderItem={({ item }) => (
               <View
-                className={`max-w-[88%] rounded-2xl px-3 py-2 ${
+                className={
                   item.role === "user"
-                    ? "self-end bg-brand-mid"
-                    : "self-start border border-border bg-surface"
-                }`}
+                    ? "max-w-[88%] self-end"
+                    : "max-w-[88%] flex-row items-end gap-2 self-start"
+                }
               >
-                <Text
-                  className={`text-sm ${item.role === "user" ? "text-white" : "text-text"}`}
+                {item.role !== "user" ? <KlaraAvatar size={28} alt="" /> : null}
+                <View
+                  className={`rounded-2xl px-3 py-2 ${
+                    item.role === "user"
+                      ? "bg-brand-mid"
+                      : "border border-border bg-surface"
+                  }`}
                 >
-                  {item.content}
-                </Text>
+                  <Text
+                    className={`text-sm ${item.role === "user" ? "text-white" : "text-text"}`}
+                  >
+                    {item.content}
+                  </Text>
+                </View>
               </View>
             )}
           />

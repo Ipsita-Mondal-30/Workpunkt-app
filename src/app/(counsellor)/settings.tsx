@@ -1,5 +1,5 @@
-import { SettingsScreen } from "@/components/settings/settings-screen";
+import { Redirect } from "expo-router";
 
-export default function CounsellorSettingsScreen() {
-  return <SettingsScreen />;
+export default function RedirectSettings() {
+  return <Redirect href="/(counsellor)/(tabs)/more/settings" />;
 }

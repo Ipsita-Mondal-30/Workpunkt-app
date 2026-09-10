@@ -9,8 +9,11 @@ import {
 } from "react-native";
 
 import { GradientButton } from "@/components/shared/gradient-button";
+import { KlaraAvatar } from "@/components/shared/klara-avatar";
 import { authFetch } from "@/lib/api/auth-fetch";
+import { AI_CHAT_WELCOME_MESSAGE } from "@/lib/klara/faq-presets";
 import { useTheme } from "@/lib/theme/theme-context";
+import { createUuid } from "@/lib/utils";
 
 type ChatMessage = {
   id: string;
@@ -25,8 +28,7 @@ export function KlaraChatScreen({ subtitle }: { subtitle?: string }) {
     {
       id: "welcome",
       role: "assistant",
-      content:
-        "Hi, I'm Klara — Workpunkt's AI counsellor. Ask me about German universities, admissions, or your pathway.",
+      content: AI_CHAT_WELCOME_MESSAGE,
     },
   ]);
   const [input, setInput] = useState("");
@@ -38,7 +40,7 @@ export function KlaraChatScreen({ subtitle }: { subtitle?: string }) {
     if (!text || sending) return;
 
     const userMessage: ChatMessage = {
-      id: `u-${Date.now()}`,
+      id: createUuid(),
       role: "user",
       content: text,
     };
@@ -112,17 +114,26 @@ export function KlaraChatScreen({ subtitle }: { subtitle?: string }) {
           <View
             className={
               item.role === "user"
-                ? "ml-10 self-end rounded-2xl bg-brand-mid px-4 py-3"
-                : "mr-10 self-start rounded-2xl bg-surface-end px-4 py-3"
+                ? "ml-10 self-end"
+                : "mr-6 flex-row items-end gap-2 self-start"
             }
           >
-            <Text
+            {item.role !== "user" ? <KlaraAvatar size={28} alt="" /> : null}
+            <View
               className={
-                item.role === "user" ? "text-sm text-white" : "text-sm text-text"
+                item.role === "user"
+                  ? "rounded-2xl bg-brand-mid px-4 py-3"
+                  : "rounded-2xl bg-surface-end px-4 py-3"
               }
             >
-              {item.content}
-            </Text>
+              <Text
+                className={
+                  item.role === "user" ? "text-sm text-white" : "text-sm text-text"
+                }
+              >
+                {item.content}
+              </Text>
+            </View>
           </View>
         )}
       />

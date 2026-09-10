@@ -2,12 +2,15 @@ import { useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
 import { useRouter } from "expo-router";
 
+import { PhoneNumberInput } from "@/components/auth/phone-number-input";
+import { SignupField, signupInputClass } from "@/components/auth/signup-field";
 import { SignupShell } from "@/components/auth/signup-shell";
 import { TermsPrivacyConsent } from "@/components/legal/terms-privacy-consent";
 import { GradientButton } from "@/components/shared/gradient-button";
 import { publicPostJson } from "@/lib/api/public-fetch";
+import { isValidPhoneNumber } from "@/lib/phone/phone-number";
+import { normalizeLeadEmail } from "@/lib/signup/email";
 import { useTheme } from "@/lib/theme/theme-context";
-import { cn } from "@/lib/utils";
 
 export default function CounsellorSignupScreen() {
   const router = useRouter();
@@ -19,9 +22,6 @@ export default function CounsellorSignupScreen() {
   const [roleDesignation, setRole] = useState("");
   const [cityCountry, setCity] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
-  const [intent, setIntent] = useState<"counsellor_access" | "career_pathing">(
-    "counsellor_access",
-  );
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [termsError, setTermsError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -30,10 +30,24 @@ export default function CounsellorSignupScreen() {
   async function onSubmit() {
     setError(null);
     setTermsError(null);
-    if (!fullName.trim() || !workEmail.trim() || !schoolName.trim()) {
+
+    const emailResult = normalizeLeadEmail(workEmail);
+    if (!emailResult.ok) {
+      setError("Enter a valid work email address.");
+      return;
+    }
+
+    if (!fullName.trim() || !schoolName.trim()) {
       setError("Please fill in your name, email, and school name.");
       return;
     }
+
+    const whatsappNumber = whatsapp.trim();
+    if (whatsappNumber && !isValidPhoneNumber(whatsappNumber)) {
+      setError("Please enter a valid WhatsApp number.");
+      return;
+    }
+
     if (!termsAccepted) {
       setTermsError("Please agree to the Terms and Conditions");
       return;
@@ -43,12 +57,12 @@ export default function CounsellorSignupScreen() {
     try {
       await publicPostJson("/api/school-counsellor/apply", {
         fullName: fullName.trim(),
-        workEmail: workEmail.trim(),
+        workEmail: emailResult.email,
         schoolName: schoolName.trim(),
         roleDesignation: roleDesignation.trim() || undefined,
         cityCountry: cityCountry.trim() || undefined,
-        whatsapp: whatsapp.trim() || undefined,
-        intent,
+        whatsapp: whatsappNumber || undefined,
+        intent: "counsellor_access",
       });
       router.replace({
         pathname: "/(auth)/signup/pending",
@@ -63,8 +77,8 @@ export default function CounsellorSignupScreen() {
 
   return (
     <SignupShell
-      title="School counsellor apply"
-      subtitle="Apply for Counsellor Access or Career Pathing."
+      title="School Counsellor Sign Up"
+      subtitle="Create your school counsellor account for Counselor Access (₹5,000). After admin approval, sign in to your dashboard and complete payment there."
       backHref="/(auth)/signup"
     >
       {error ? (
@@ -73,72 +87,66 @@ export default function CounsellorSignupScreen() {
         </View>
       ) : null}
 
-      <View className="mb-4 flex-row gap-2">
-        {(
-          [
-            ["counsellor_access", "Counsellor Access"],
-            ["career_pathing", "Career Pathing"],
-          ] as const
-        ).map(([value, label]) => (
-          <Pressable
-            key={value}
-            onPress={() => setIntent(value)}
-            className={cn(
-              "flex-1 rounded-xl border px-3 py-3",
-              intent === value
-                ? "border-brand-mid bg-brand-mid/15"
-                : "border-border bg-surface",
-            )}
-          >
-            <Text className="text-center text-xs font-semibold text-text">{label}</Text>
-          </Pressable>
-        ))}
-      </View>
+      <SignupField label="Full name">
+        <TextInput
+          placeholder="Priya Sharma"
+          placeholderTextColor={placeholderColor}
+          value={fullName}
+          onChangeText={setFullName}
+          className={signupInputClass()}
+        />
+      </SignupField>
 
-      <TextInput
-        placeholder="Full name"
-        placeholderTextColor={placeholderColor}
-        value={fullName}
-        onChangeText={setFullName}
-        className="mb-3 rounded-2xl border border-border bg-surface px-4 py-4 text-base text-text"
-      />
-      <TextInput
-        autoCapitalize="none"
-        keyboardType="email-address"
-        placeholder="Work email"
-        placeholderTextColor={placeholderColor}
-        value={workEmail}
-        onChangeText={setWorkEmail}
-        className="mb-3 rounded-2xl border border-border bg-surface px-4 py-4 text-base text-text"
-      />
-      <TextInput
-        placeholder="School name"
-        placeholderTextColor={placeholderColor}
-        value={schoolName}
-        onChangeText={setSchoolName}
-        className="mb-3 rounded-2xl border border-border bg-surface px-4 py-4 text-base text-text"
-      />
-      <TextInput
-        placeholder="Role / designation (optional)"
-        placeholderTextColor={placeholderColor}
-        value={roleDesignation}
-        onChangeText={setRole}
-        className="mb-3 rounded-2xl border border-border bg-surface px-4 py-4 text-base text-text"
-      />
-      <TextInput
-        placeholder="City, Country (optional)"
-        placeholderTextColor={placeholderColor}
-        value={cityCountry}
-        onChangeText={setCity}
-        className="mb-3 rounded-2xl border border-border bg-surface px-4 py-4 text-base text-text"
-      />
-      <TextInput
-        placeholder="WhatsApp (optional)"
-        placeholderTextColor={placeholderColor}
-        value={whatsapp}
-        onChangeText={setWhatsapp}
-        className="mb-4 rounded-2xl border border-border bg-surface px-4 py-4 text-base text-text"
-      />
+      <SignupField label="Work email">
+        <TextInput
+          autoCapitalize="none"
+          autoComplete="email"
+          keyboardType="email-address"
+          placeholder="counsellor@school.edu"
+          placeholderTextColor={placeholderColor}
+          value={workEmail}
+          onChangeText={setWorkEmail}
+          className={signupInputClass()}
+        />
+      </SignupField>
+
+      <SignupField label="School / university name">
+        <TextInput
+          placeholder="Delhi Public School"
+          placeholderTextColor={placeholderColor}
+          value={schoolName}
+          onChangeText={setSchoolName}
+          className={signupInputClass()}
+        />
+      </SignupField>
+
+      <SignupField label="Role / designation">
+        <TextInput
+          placeholder="College Counselor"
+          placeholderTextColor={placeholderColor}
+          value={roleDesignation}
+          onChangeText={setRole}
+          className={signupInputClass()}
+        />
+      </SignupField>
+
+      <SignupField label="City & country">
+        <TextInput
+          placeholder="Mumbai, India"
+          placeholderTextColor={placeholderColor}
+          value={cityCountry}
+          onChangeText={setCity}
+          className={signupInputClass()}
+        />
+      </SignupField>
+
+      <SignupField label="WhatsApp">
+        <PhoneNumberInput
+          value={whatsapp}
+          onChange={setWhatsapp}
+          placeholder="Mobile number"
+        />
+      </SignupField>
 
       <TermsPrivacyConsent
         checked={termsAccepted}
@@ -150,11 +158,18 @@ export default function CounsellorSignupScreen() {
       />
 
       <GradientButton
-        text={loading ? "Submitting…" : "Submit application"}
+        text={loading ? "Submitting…" : "Submit school counsellor application"}
         loading={loading}
         disabled={!termsAccepted}
         onPress={() => void onSubmit()}
       />
+
+      <View className="mt-4 flex-row flex-wrap items-center justify-center gap-1">
+        <Text className="text-sm text-muted">Already joined?</Text>
+        <Pressable onPress={() => router.push("/(auth)/login")}>
+          <Text className="text-sm font-semibold text-text underline">Partner Login</Text>
+        </Pressable>
+      </View>
     </SignupShell>
   );
 }

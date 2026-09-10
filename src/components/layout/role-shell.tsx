@@ -12,9 +12,11 @@ import { usePathname, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { WorkpunktLogo } from "@/components/shared/workpunkt-logo";
-import { ROLE_NAV, ROLE_TITLE } from "@/constants/nav";
+import { KlaraFab } from "@/components/klara/klara-fab";
+import { COUNSELLOR_CP_NAV, ROLE_NAV, ROLE_TITLE } from "@/constants/nav";
 import { useAuth } from "@/lib/auth/auth-context";
 import type { AppRole } from "@/lib/auth/resolve-role";
+import { useOptionalCounsellorContext } from "@/lib/counsellor/use-counsellor-context";
 import { cn } from "@/lib/utils";
 
 type RoleShellProps = {
@@ -46,7 +48,22 @@ export function RoleShell({ role, title, children }: RoleShellProps) {
   const router = useRouter();
   const pathname = usePathname();
   const { profile, signOut } = useAuth();
-  const items = ROLE_NAV[role];
+  const counsellorCtx = useOptionalCounsellorContext();
+  const items =
+    role === "counsellor" && counsellorCtx?.careerPathingActive
+      ? (() => {
+          const base = ROLE_NAV.counsellor;
+          const insertAt = Math.max(
+            0,
+            base.findIndex((item) => item.label === "Training Hub"),
+          );
+          return [
+            ...base.slice(0, insertAt),
+            ...COUNSELLOR_CP_NAV,
+            ...base.slice(insertAt),
+          ];
+        })()
+      : ROLE_NAV[role];
 
   function openDrawer() {
     setVisible(true);
@@ -109,7 +126,10 @@ export function RoleShell({ role, title, children }: RoleShellProps) {
         <View className="w-10" />
       </View>
 
-      <View className="flex-1 bg-bg">{children}</View>
+      <View className="flex-1 bg-bg">
+        {children}
+        <KlaraFab role={role} />
+      </View>
 
       <Modal
         visible={visible}

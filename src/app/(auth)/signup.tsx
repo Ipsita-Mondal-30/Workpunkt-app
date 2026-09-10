@@ -19,7 +19,7 @@ const ROLES = [
   {
     key: "counsellor",
     title: "School Counsellor",
-    body: "Apply for Counsellor Access or Career Pathing for your school.",
+    body: "Create your school counsellor account for Counselor Access (₹5,000).",
     href: "/(auth)/signup/counsellor",
   },
 ] as const;
