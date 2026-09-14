@@ -1,8 +1,10 @@
-import { Alert, Pressable, ScrollView, Text, View } from "react-native";
+import { Alert, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 
 import { postApiJson } from "@/lib/query/use-api";
+import { PageHeading, PortalHero, PortalIcon, PortalPage } from "@/components/portal/portal-ui";
+import { GradientButton } from "@/components/shared/gradient-button";
 
 const SERVICES = [
   { id: "visa", title: "Green Light — APS + Student Visa Support", description: "Every document APS and the visa office need, prepared right the first time.", price: "€299", note: "One-time" },
@@ -35,28 +37,23 @@ export default function StudentServicesScreen() {
   }
 
   return (
-    <ScrollView className="flex-1 bg-bg" contentContainerClassName="px-4 py-5 pb-12">
-      <Text className="text-2xl font-bold text-text">Germany Support Services</Text>
-      <Text className="mt-2 text-sm leading-5 text-muted">Choose the support you need. Your private-university application through Workpunkt remains free.</Text>
-      <View className="mt-5 rounded-3xl border border-brand-mid/20 bg-brand-start/10 px-5 py-5">
-        <Text className="text-xs font-bold uppercase tracking-wider text-brand-mid">Private university application</Text>
-        <Text className="mt-1 text-3xl font-black text-text">FREE</Text>
-        <Text className="text-xs font-bold uppercase text-muted">Always & forever</Text>
-      </View>
-      <View className="mt-5 gap-3">
+    <PortalPage>
+      <PageHeading eyebrow="A LITTLE HELP. A LONG WAY." title="Support for your Germany journey." subtitle="Choose the support you need, from your first application to settling into a new city." />
+      <PortalHero eyebrow="PRIVATE UNIVERSITY APPLICATION" title="Free. Always & forever." description="Your private-university application through Workpunkt remains free. Add extra support only where you need it." />
+      <Text className="mb-5 text-sm leading-6 text-muted">Request a service to speak with your counsellor. Sending a request does not charge you or complete a purchase.</Text>
+      <View className="flex-row flex-wrap gap-4">
         {SERVICES.map((service) => (
-          <View key={service.id} className="rounded-2xl border border-border bg-surface px-4 py-4">
+          <View key={service.id} style={{ flexBasis: 280, flexGrow: 1, flexShrink: 1 }} className="rounded-3xl border border-border bg-surface p-5">
+            <View className="mb-4 h-11 w-11 items-center justify-center rounded-2xl bg-brand-start/10"><PortalIcon name={service.id === "report" ? "sparkle" : service.id === "language" ? "book" : service.id === "accommodation" ? "home" : "file"} /></View>
             <Text className="text-base font-bold text-text">{service.title}</Text>
             <Text className="mt-2 text-sm leading-5 text-muted">{service.description}</Text>
-            <View className="mt-4 flex-row items-end justify-between gap-3">
+            <View className="mt-5 flex-1 justify-end gap-4">
               <View><Text className="text-lg font-black text-brand-mid">{service.price}</Text><Text className="text-[11px] text-muted">{service.note}</Text></View>
-              <Pressable disabled={Boolean(pending)} onPress={() => void request(service)} className="rounded-xl bg-brand-mid px-4 py-3">
-                <Text className="text-xs font-bold text-white">{pending === service.id ? "Sending…" : "+ Add"}</Text>
-              </Pressable>
+              <GradientButton text="Request this service" accessibilityLabel={`Request ${service.title}`} loading={pending === service.id} disabled={Boolean(pending)} onPress={() => void request(service)} />
             </View>
           </View>
         ))}
       </View>
-    </ScrollView>
+    </PortalPage>
   );
 }

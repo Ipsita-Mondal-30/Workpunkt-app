@@ -3,10 +3,10 @@ import { Text, View } from "react-native";
 import { cn } from "@/lib/utils";
 
 const COLOR_MAP = {
-  purple: "bg-brand-start/15 text-brand-start",
-  pink: "bg-brand-mid/15 text-brand-mid",
-  blue: "bg-info/15 text-info",
-  green: "bg-success/15 text-success",
+  purple: "bg-brand-start",
+  pink: "bg-brand-mid",
+  blue: "bg-info",
+  green: "bg-success",
 } as const;
 
 export type StatCard = {
@@ -21,16 +21,14 @@ export function StatsRow({ stats }: { stats: StatCard[] }) {
   if (!stats.length) return null;
 
   return (
-    <View className="mb-4 flex-row flex-wrap gap-2">
+    <View className="mb-6 flex-row flex-wrap gap-3">
       {stats.map((stat) => (
         <View
           key={stat.id}
-          className={cn(
-            "min-w-[46%] flex-1 rounded-2xl border border-border px-3 py-3",
-            COLOR_MAP[stat.color ?? "purple"].split(" ")[0],
-          )}
+          className="min-w-[140px] flex-1 rounded-2xl border border-border bg-surface px-4 py-5"
         >
-          <Text className="text-xl font-bold text-text">{stat.value}</Text>
+          <View className={cn("mb-4 h-1 w-7 rounded-full", COLOR_MAP[stat.color ?? "purple"])} />
+          <Text className="text-2xl font-bold tracking-tight text-text">{stat.value}</Text>
           <Text className="mt-1 text-xs font-semibold text-text">{stat.label}</Text>
           {stat.sub ? <Text className="mt-1 text-xs text-muted">{stat.sub}</Text> : null}
         </View>

@@ -1,4 +1,4 @@
-import { Linking, Pressable, ScrollView, Switch, Text, View } from "react-native";
+import { Linking, Pressable, Switch, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 
@@ -10,6 +10,7 @@ import {
   legalPaths,
 } from "@/lib/legal";
 import { useTheme } from "@/lib/theme/theme-context";
+import { PageHeading, PortalCard, PortalPage } from "@/components/portal/portal-ui";
 
 function siteBaseUrl() {
   const apiUrl = process.env.EXPO_PUBLIC_API_URL?.replace(/\/$/, "");
@@ -38,13 +39,16 @@ export function SettingsScreen() {
   }
 
   return (
-    <ScrollView className="flex-1 bg-bg" contentContainerClassName="px-4 py-6 pb-12">
-      <Text className="text-2xl font-bold text-text">Settings</Text>
-      <Text className="mt-2 text-sm text-muted">
-        {profile?.email ?? "Manage your app preferences"}
-      </Text>
+    <PortalPage>
+      <PageHeading title="Make yourself at home." eyebrow="ACCOUNT & PREFERENCES" subtitle="Your account, your appearance preferences and the small print, all in one place." />
+      <PortalCard>
+        <View className="flex-row items-center gap-4">
+          <View className="h-14 w-14 items-center justify-center rounded-2xl bg-brand-start/10"><Text className="text-2xl font-bold text-brand-start">{profile?.name?.slice(0, 1).toUpperCase() || "W"}</Text></View>
+          <View className="flex-1"><Text className="text-lg font-bold text-text">{profile?.name || "Your Workpunkt account"}</Text><Text selectable className="mt-1 text-sm text-muted">{profile?.email || "Signed in"}</Text></View>
+        </View>
+      </PortalCard>
 
-      <View className="mt-8 rounded-2xl border border-border bg-surface px-4 py-4">
+      <View className="rounded-3xl border border-border bg-surface p-5">
         <View className="flex-row items-center justify-between">
           <View className="flex-1 pr-4">
             <Text className="text-base font-semibold text-text">Appearance</Text>
@@ -65,7 +69,7 @@ export function SettingsScreen() {
         </Text>
       </View>
 
-      <View className="mt-6 rounded-2xl border border-border bg-surface px-4 py-4">
+      <View className="mt-5 rounded-3xl border border-border bg-surface p-5">
         <Text className="text-base font-semibold text-text">Legal</Text>
         <Text className="mt-1 text-sm text-muted">
           Policies and company information (available offline).
@@ -106,6 +110,6 @@ export function SettingsScreen() {
       >
         <Text className="text-center text-base font-semibold text-error">Log out</Text>
       </Pressable>
-    </ScrollView>
+    </PortalPage>
   );
 }

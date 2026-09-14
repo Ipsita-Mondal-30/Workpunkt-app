@@ -1,15 +1,16 @@
-import { ActivityIndicator, Pressable, RefreshControl, ScrollView, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import type { ReactNode } from "react";
 import type { QueryKey } from "@tanstack/react-query";
 
 import { useApiQuery } from "@/lib/query/use-api";
+import { LoadingCards, PageHeading, PortalPage } from "@/components/portal/portal-ui";
 
 type ResourceScreenProps<T> = {
   title: string;
   subtitle?: string;
   queryKey: QueryKey;
   path: string;
-  children: (data: T, helpers: { refetch: () => void }) => ReactNode;
+  children: (data: T, helpers: { refetch: () => Promise<void> }) => ReactNode;
   headerRight?: ReactNode;
   staleTime?: number;
 };
@@ -29,33 +30,13 @@ export function ResourceScreen<T>({
 
   if (query.isLoading && !query.data) {
     return (
-      <View className="flex-1 items-center justify-center bg-bg">
-        <ActivityIndicator color="#f6339a" />
-      </View>
+      <PortalPage><PageHeading title={title} subtitle={subtitle} /><LoadingCards /></PortalPage>
     );
   }
 
   return (
-    <ScrollView
-      className="flex-1 bg-bg"
-      contentContainerClassName="px-4 py-4 pb-10"
-      refreshControl={
-        <RefreshControl
-          refreshing={query.isRefetching && !query.isLoading}
-          onRefresh={() => void query.refetch()}
-          tintColor="#f6339a"
-        />
-      }
-    >
-      <View className="mb-4 flex-row items-start justify-between gap-3">
-        <View className="flex-1">
-          <Text className="text-2xl font-bold text-text">{title}</Text>
-          {subtitle ? (
-            <Text className="mt-1 text-sm text-muted">{subtitle}</Text>
-          ) : null}
-        </View>
-        {headerRight}
-      </View>
+    <PortalPage refreshing={query.isRefetching && !query.isLoading} onRefresh={() => void query.refetch()}>
+      <PageHeading title={title} subtitle={subtitle} action={headerRight} />
 
       {query.error ? (
         <View className="mb-4 rounded-2xl bg-error/10 px-4 py-3">
@@ -66,7 +47,7 @@ export function ResourceScreen<T>({
         </View>
       ) : null}
 
-      {query.data ? children(query.data, { refetch: () => void query.refetch() }) : null}
-    </ScrollView>
+      {query.data != null ? children(query.data, { refetch: async () => { await query.refetch(); } }) : null}
+    </PortalPage>
   );
 }

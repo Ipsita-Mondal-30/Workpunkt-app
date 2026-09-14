@@ -1,12 +1,10 @@
 import type { ReactNode } from "react";
 import {
-  ActivityIndicator,
   Pressable,
-  RefreshControl,
-  ScrollView,
   Text,
   View,
 } from "react-native";
+import { LoadingCards, PortalPage } from "@/components/portal/portal-ui";
 
 type CounsellorScrollProps = {
   children: ReactNode;
@@ -25,34 +23,19 @@ export function CounsellorScroll({
 }: CounsellorScrollProps) {
   if (loading) {
     return (
-      <View className="flex-1 items-center justify-center bg-bg">
-        <ActivityIndicator color="#f6339a" />
-      </View>
+      <PortalPage><LoadingCards /></PortalPage>
     );
   }
 
   return (
-    <ScrollView
-      className="flex-1 bg-bg"
-      contentContainerClassName="px-4 py-4 pb-10"
-      keyboardShouldPersistTaps="handled"
-      refreshControl={
-        onRefresh ? (
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            tintColor="#f6339a"
-          />
-        ) : undefined
-      }
-    >
+    <PortalPage refreshing={refreshing} onRefresh={onRefresh}>
       {error ? (
         <View className="mb-4 rounded-2xl bg-error/10 px-4 py-3">
           <Text className="text-sm text-error">{error}</Text>
         </View>
       ) : null}
       {children}
-    </ScrollView>
+    </PortalPage>
   );
 }
 

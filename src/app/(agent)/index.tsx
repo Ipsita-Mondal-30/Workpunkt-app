@@ -9,6 +9,7 @@ import { useAuth } from "@/lib/auth/auth-context";
 import { openExternalUrl } from "@/lib/open-external-url";
 import { queryKeys } from "@/lib/query/keys";
 import { useApiQuery } from "@/lib/query/use-api";
+import { ActionTile, PortalHero, ProgressBar } from "@/components/portal/portal-ui";
 
 type AgentDashboardData = {
   recentActivity: {
@@ -91,7 +92,9 @@ export default function AgentHome() {
     >
       {(data) => (
         <>
+          <PortalHero eyebrow="GERMANY ADMISSIONS PARTNER" title="Great guidance. Brighter futures." description="Help your students take their next step. Manage applications, build your expertise and grow with Workpunkt."><View className="max-w-xs"><GradientButton text="Add a student" onPress={() => router.push("/(agent)/add-student" as never)} /></View></PortalHero>
           <StatsRow stats={buildDashboardStats(data, unread)} />
+          <View className="mb-6 rounded-3xl border border-border bg-surface p-5"><Text className="text-base font-bold text-text">Your partner training</Text><Text className="mb-4 mt-2 text-sm text-muted">{data.training.mandatoryCompleted} of {data.training.mandatoryTotal} required modules completed</Text><ProgressBar value={data.training.overallPercent} label="Partner training progress" /><Pressable accessibilityRole="button" onPress={() => router.push("/(agent)/training")} className="mt-3 py-3"><Text className="text-xs font-bold text-brand-start">Continue learning →</Text></Pressable></View>
 
           {data.recentActivity.items.length > 0 ? (
             <View className="mb-4 gap-2">
@@ -120,11 +123,13 @@ export default function AgentHome() {
           ) : null}
 
           <Text className="mb-3 text-sm font-semibold text-text">Quick links</Text>
-          <View className="gap-3">
+          <View className="flex-row flex-wrap gap-3">
             {SHORTCUTS.map((item) => (
-              <GradientButton
+              <ActionTile
                 key={item.href}
-                text={item.label}
+                title={item.label}
+                description={item.label === "Ask Klara" ? "Guidance for you and your students" : `Open ${item.label.toLowerCase()}`}
+                icon={item.label === "Ask Klara" ? "sparkle" : item.label.includes("Student") ? "people" : item.label === "Training" ? "book" : item.label === "Payments" ? "wallet" : "chat"}
                 onPress={() => router.push(item.href as never)}
               />
             ))}
