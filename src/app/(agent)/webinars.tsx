@@ -1,6 +1,7 @@
-import { Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
 import { ResourceScreen } from "@/components/shared/resource-screen";
+import { openExternalUrl } from "@/lib/open-external-url";
 import { queryKeys } from "@/lib/query/keys";
 
 type AgentFeaturedWebinar = {
@@ -12,6 +13,9 @@ type AgentFeaturedWebinar = {
   time: string;
   host: string;
   registeredCount: number;
+  registrationUrl?: string;
+  joinUrl?: string;
+  url?: string;
 };
 
 type AgentFutureWebinar = {
@@ -21,6 +25,9 @@ type AgentFutureWebinar = {
   time: string;
   registeredCount: number;
   status: string;
+  registrationUrl?: string;
+  joinUrl?: string;
+  url?: string;
 };
 
 type AgentPastRecording = {
@@ -30,6 +37,8 @@ type AgentPastRecording = {
   durationLabel: string;
   dateLabel: string;
   hostName: string | null;
+  playbackUrl?: string;
+  url?: string;
 };
 
 type AgentWebinarsData = {
@@ -41,6 +50,8 @@ type AgentWebinarsData = {
     month: string;
     description: string;
     isLatest: boolean;
+    url?: string;
+    downloadUrl?: string;
   }>;
 };
 
@@ -55,7 +66,7 @@ export default function AgentWebinarsScreen() {
       {(data) => (
         <>
           {data.featured ? (
-            <View className="mb-4 rounded-2xl border border-brand-mid/30 bg-surface px-4 py-4">
+            <Pressable disabled={!data.featured.joinUrl && !data.featured.registrationUrl && !data.featured.url} onPress={() => void openExternalUrl(data.featured!.joinUrl || data.featured!.registrationUrl || data.featured!.url || "")} className="mb-4 rounded-2xl border border-brand-mid/30 bg-surface px-4 py-4">
               <Text className="text-xs font-semibold uppercase text-brand-mid">
                 {data.featured.badge}
               </Text>
@@ -67,7 +78,8 @@ export default function AgentWebinarsScreen() {
               <Text className="mt-1 text-xs text-brand-mid">
                 {data.featured.registeredCount} registered
               </Text>
-            </View>
+              {data.featured.joinUrl || data.featured.registrationUrl || data.featured.url ? <Text className="mt-3 text-xs font-bold text-brand-mid">{data.featured.joinUrl ? "Join webinar" : "Register now"} →</Text> : null}
+            </Pressable>
           ) : null}
 
           {data.futureWebinars.length > 0 ? (
@@ -75,8 +87,10 @@ export default function AgentWebinarsScreen() {
               <Text className="mb-2 text-sm font-semibold text-text">Upcoming</Text>
               <View className="gap-2">
                 {data.futureWebinars.map((webinar) => (
-                  <View
+                  <Pressable
                     key={webinar.id}
+                    disabled={!webinar.joinUrl && !webinar.registrationUrl && !webinar.url}
+                    onPress={() => void openExternalUrl(webinar.joinUrl || webinar.registrationUrl || webinar.url || "")}
                     className="rounded-2xl border border-border bg-surface px-4 py-3"
                   >
                     <Text className="text-sm font-semibold text-text">{webinar.title}</Text>
@@ -86,7 +100,8 @@ export default function AgentWebinarsScreen() {
                     <Text className="mt-1 text-xs uppercase text-brand-mid">
                       {webinar.status} · {webinar.registeredCount} registered
                     </Text>
-                  </View>
+                    {webinar.joinUrl || webinar.registrationUrl || webinar.url ? <Text className="mt-2 text-xs font-bold text-brand-mid">{webinar.joinUrl ? "Join" : "View details"} →</Text> : null}
+                  </Pressable>
                 ))}
               </View>
             </View>
@@ -97,8 +112,10 @@ export default function AgentWebinarsScreen() {
               <Text className="mb-2 text-sm font-semibold text-text">Recordings</Text>
               <View className="gap-2">
                 {data.pastRecordings.map((recording) => (
-                  <View
+                  <Pressable
                     key={recording.id}
+                    disabled={!recording.playbackUrl && !recording.url}
+                    onPress={() => void openExternalUrl(recording.playbackUrl || recording.url || "")}
                     className="rounded-2xl border border-border bg-surface px-4 py-3"
                   >
                     <Text className="text-sm font-semibold text-text">{recording.title}</Text>
@@ -111,7 +128,8 @@ export default function AgentWebinarsScreen() {
                       {recording.durationLabel} · {recording.dateLabel}
                       {recording.hostName ? ` · ${recording.hostName}` : ""}
                     </Text>
-                  </View>
+                    {recording.playbackUrl || recording.url ? <Text className="mt-2 text-xs font-bold text-brand-mid">Watch recording →</Text> : null}
+                  </Pressable>
                 ))}
               </View>
             </View>
@@ -122,8 +140,10 @@ export default function AgentWebinarsScreen() {
               <Text className="mb-2 text-sm font-semibold text-text">Newsletters</Text>
               <View className="gap-2">
                 {data.newsletters.map((issue) => (
-                  <View
+                  <Pressable
                     key={issue.id}
+                    disabled={!issue.url && !issue.downloadUrl}
+                    onPress={() => void openExternalUrl(issue.url || issue.downloadUrl || "")}
                     className="rounded-2xl border border-border bg-surface px-4 py-3"
                   >
                     <Text className="text-sm font-semibold text-text">{issue.month}</Text>
@@ -133,7 +153,8 @@ export default function AgentWebinarsScreen() {
                         Latest
                       </Text>
                     ) : null}
-                  </View>
+                    {issue.url || issue.downloadUrl ? <Text className="mt-2 text-xs font-bold text-brand-mid">Read newsletter →</Text> : null}
+                  </Pressable>
                 ))}
               </View>
             </View>

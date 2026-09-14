@@ -53,7 +53,8 @@ export default function AgentKlaraScreen() {
 
   return (
     <KlaraMatchingScreen
-      requireStudentTarget
+      showStudentPicker
+      matchingRequiresTarget
       studentEmail={params.studentEmail}
       studentProfileId={params.studentProfileId}
       studentName={params.studentName}

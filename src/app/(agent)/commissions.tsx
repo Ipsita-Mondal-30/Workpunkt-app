@@ -3,6 +3,7 @@ import { Text, View } from "react-native";
 import { ResourceScreen } from "@/components/shared/resource-screen";
 import { StatsRow } from "@/components/shared/stats-row";
 import { queryKeys } from "@/lib/query/keys";
+import { dateLabel } from "@/lib/student/presentation";
 
 type CommissionRecord = {
   id: string;
@@ -29,6 +30,13 @@ type AgentCommissionsData = {
 function formatInr(value: number | null) {
   if (value == null) return "TBC";
   return `₹${value.toLocaleString("en-IN")}`;
+}
+
+function formatAmount(record: CommissionRecord) {
+  if (record.amountLabel === "tbc") return "TBC";
+  if (record.amountInr != null) return formatInr(record.amountInr);
+  if (record.amountEur != null) return `€${record.amountEur.toLocaleString("de-DE")}`;
+  return "TBC";
 }
 
 export default function AgentCommissionsScreen() {
@@ -83,15 +91,13 @@ export default function AgentCommissionsScreen() {
                   </Text>
                   <View className="mt-2 flex-row items-center justify-between gap-2">
                     <Text className="text-sm font-semibold text-text">
-                      {record.amountLabel === "tbc"
-                        ? "TBC"
-                        : formatInr(record.amountInr)}
+                      {formatAmount(record)}
                     </Text>
                     <Text className="text-xs font-semibold uppercase text-brand-mid">
                       {record.status.replace(/_/g, " ")}
                     </Text>
                   </View>
-                  <Text className="mt-1 text-xs text-muted">{record.date}</Text>
+                  <Text className="mt-1 text-xs text-muted">{dateLabel(record.date)}</Text>
                 </View>
               ))
             )}

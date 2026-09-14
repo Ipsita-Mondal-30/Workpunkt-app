@@ -7,9 +7,16 @@ export type NavItem = {
 
 export const ROLE_NAV: Record<AppRole, NavItem[]> = {
   student: [
-    { label: "Home", href: "/(student)" },
-    { label: "Matched Programs", href: "/(student)/matches" },
+    { label: "Dashboard", href: "/(student)" },
+    { label: "Programs", href: "/(student)/matches" },
+    { label: "Applications", href: "/(student)/applications" },
+    { label: "Documents", href: "/(student)/documents" },
+    { label: "Services", href: "/(student)/services" },
+    { label: "Content Hub", href: "/(student)/content" },
+    { label: "Post-Admission", href: "/(student)/post-admission" },
     { label: "Ask Klara", href: "/(student)/klara" },
+    { label: "Help & Counsellor", href: "/(student)/support" },
+    { label: "Notifications", href: "/(student)/notifications" },
     { label: "Settings", href: "/(student)/settings" },
   ],
   admin: [
@@ -23,16 +30,17 @@ export const ROLE_NAV: Record<AppRole, NavItem[]> = {
     { label: "Settings", href: "/(admin)/settings" },
   ],
   agent: [
-    { label: "Home", href: "/(agent)" },
+    { label: "Dashboard", href: "/(agent)" },
     { label: "My Students", href: "/(agent)/students" },
     { label: "Student Programs", href: "/(agent)/student-programs" },
     { label: "Commissions", href: "/(agent)/commissions" },
     { label: "Payments", href: "/(agent)/payments" },
-    { label: "Training", href: "/(agent)/training" },
-    { label: "Resources", href: "/(agent)/resources" },
-    { label: "Webinars", href: "/(agent)/webinars" },
+    { label: "Training Hub", href: "/(agent)/training" },
+    { label: "Resource Hub", href: "/(agent)/resources" },
+    { label: "Webinars & News", href: "/(agent)/webinars" },
     { label: "Ask Klara", href: "/(agent)/klara" },
     { label: "Message Team", href: "/(agent)/message-team" },
+    { label: "Notifications", href: "/(agent)/notifications" },
     { label: "Settings", href: "/(agent)/settings" },
   ],
   counsellor: [

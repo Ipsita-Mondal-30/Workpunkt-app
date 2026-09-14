@@ -31,10 +31,12 @@ function ModuleCard({
   module: TrainingModule;
   onPress: () => void;
 }) {
+  const locked = module.status === "locked";
   return (
     <Pressable
+      disabled={locked}
       onPress={onPress}
-      className="rounded-2xl border border-border bg-surface px-4 py-4"
+      className={locked ? "rounded-2xl border border-border bg-surface-end px-4 py-4 opacity-60" : "rounded-2xl border border-border bg-surface px-4 py-4"}
     >
       <View className="flex-row items-start justify-between gap-2">
         <Text className="flex-1 text-base font-semibold text-text">{module.title}</Text>

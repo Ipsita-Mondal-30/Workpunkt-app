@@ -1,5 +1,9 @@
 export const queryKeys = {
   matches: () => ["matches"] as const,
+  studentApplications: () => ["student", "applications"] as const,
+  studentDocuments: () => ["student", "documents"] as const,
+  studentContent: () => ["student", "content"] as const,
+  studentNotifications: () => ["student", "notifications"] as const,
   agentDashboard: () => ["agent", "dashboard"] as const,
   agentStudents: () => ["agent", "students"] as const,
   agentCommissions: () => ["agent", "commissions"] as const,

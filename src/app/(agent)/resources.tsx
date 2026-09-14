@@ -1,6 +1,8 @@
-import { Text, View } from "react-native";
+import { useState } from "react";
+import { Pressable, Text, TextInput, View } from "react-native";
 
 import { ResourceScreen } from "@/components/shared/resource-screen";
+import { openExternalUrl } from "@/lib/open-external-url";
 import { queryKeys } from "@/lib/query/keys";
 
 type AgentResource = {
@@ -19,7 +21,14 @@ type AgentResourcesData = {
   resources: AgentResource[];
 };
 
+function resourceLink(resource: AgentResource) {
+  if (resource.url) return resource.url;
+  return /^(https?:\/\/|\/)/.test(resource.action) ? resource.action : "";
+}
+
 export default function AgentResourcesScreen() {
+  const [search, setSearch] = useState("");
+
   return (
     <ResourceScreen<AgentResourcesData>
       title="Resources"
@@ -27,16 +36,24 @@ export default function AgentResourcesScreen() {
       queryKey={queryKeys.agentResources()}
       path="/api/agent/resources"
     >
-      {(data) => (
-        <View className="gap-2">
-          {data.resources.length === 0 ? (
+      {(data) => {
+        const needle = search.trim().toLowerCase();
+        const resources = data.resources.filter((resource) => !needle || `${resource.title} ${resource.description} ${resource.category} ${resource.meta}`.toLowerCase().includes(needle));
+        return (
+        <View>
+          <TextInput value={search} onChangeText={setSearch} placeholder="Search resources…" placeholderTextColor="#71717a" className="mb-4 rounded-xl border border-border bg-surface px-4 py-3 text-sm text-text" />
+          <View className="gap-2">
+          {resources.length === 0 ? (
             <View className="rounded-2xl border border-border bg-surface px-4 py-6">
-              <Text className="text-sm text-muted">No resources available.</Text>
+              <Text className="text-sm text-muted">{data.resources.length ? "No resources match your search." : "No resources available."}</Text>
             </View>
           ) : (
-            data.resources.map((resource) => (
-              <View
+            resources.map((resource) => {
+              const link = resourceLink(resource);
+              return <Pressable
                 key={resource.id}
+                disabled={!link}
+                onPress={() => void openExternalUrl(link)}
                 className="rounded-2xl border border-border bg-surface px-4 py-4"
               >
                 <Text className="text-base font-semibold text-text">
@@ -53,13 +70,15 @@ export default function AgentResourcesScreen() {
                   </Text>
                 </View>
                 <Text className="mt-2 text-xs font-semibold text-brand-mid">
-                  {resource.actionLabel}
+                  {resource.actionLabel}{link ? " →" : ""}
                 </Text>
-              </View>
-            ))
+              </Pressable>;
+            })
           )}
+          </View>
         </View>
-      )}
+        );
+      }}
     </ResourceScreen>
   );
 }

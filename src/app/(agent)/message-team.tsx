@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ResourceScreen } from "@/components/shared/resource-screen";
 import { queryKeys } from "@/lib/query/keys";
 import { useApiMutation } from "@/lib/query/use-api";
+import { dateLabel } from "@/lib/student/presentation";
 
 type SupportMessage = {
   id: string;
@@ -68,7 +69,7 @@ export default function AgentMessageTeamScreen() {
                     {item.senderName} · {item.senderRole}
                   </Text>
                   <Text className="mt-1 text-sm text-text">{item.body}</Text>
-                  <Text className="mt-2 text-[11px] text-muted">{item.createdAt}</Text>
+                  <Text className="mt-2 text-[11px] text-muted">{dateLabel(item.createdAt)}</Text>
                 </View>
               ))
             )}

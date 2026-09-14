@@ -15,8 +15,11 @@ import { WorkpunktLogo } from "@/components/shared/workpunkt-logo";
 import { KlaraFab } from "@/components/klara/klara-fab";
 import { COUNSELLOR_CP_NAV, ROLE_NAV, ROLE_TITLE } from "@/constants/nav";
 import { useAuth } from "@/lib/auth/auth-context";
+import type { AgentNotification } from "@/lib/agent/notifications";
 import type { AppRole } from "@/lib/auth/resolve-role";
 import { useOptionalCounsellorContext } from "@/lib/counsellor/use-counsellor-context";
+import { queryKeys } from "@/lib/query/keys";
+import { useApiQuery } from "@/lib/query/use-api";
 import { cn } from "@/lib/utils";
 
 type RoleShellProps = {
@@ -49,6 +52,12 @@ export function RoleShell({ role, title, children }: RoleShellProps) {
   const pathname = usePathname();
   const { profile, signOut } = useAuth();
   const counsellorCtx = useOptionalCounsellorContext();
+  const agentNotifications = useApiQuery<AgentNotification[]>(
+    queryKeys.agentNotifications(),
+    "/api/agent/notifications",
+    { enabled: role === "agent", staleTime: 30_000 },
+  );
+  const agentUnread = (agentNotifications.data ?? []).filter((item) => !item.isRead).length;
   const items =
     role === "counsellor" && counsellorCtx?.careerPathingActive
       ? (() => {
@@ -123,7 +132,20 @@ export function RoleShell({ role, title, children }: RoleShellProps) {
         <Text className="flex-1 px-3 text-center text-base font-semibold text-text">
           {title}
         </Text>
-        <View className="w-10" />
+        {role === "agent" ? (
+          <Pressable
+            accessibilityLabel={`Notifications${agentUnread ? `, ${agentUnread} unread` : ""}`}
+            onPress={() => router.push("/(agent)/notifications" as never)}
+            className="relative h-10 w-10 items-center justify-center rounded-xl bg-surface-end"
+          >
+            <Text className="text-lg text-text">🔔</Text>
+            {agentUnread > 0 ? (
+              <View className="absolute -right-1 -top-1 min-w-5 items-center rounded-full bg-brand-mid px-1 py-0.5">
+                <Text className="text-[9px] font-bold text-white">{agentUnread > 9 ? "9+" : agentUnread}</Text>
+              </View>
+            ) : null}
+          </Pressable>
+        ) : <View className="w-10" />}
       </View>
 
       <View className="flex-1 bg-bg">

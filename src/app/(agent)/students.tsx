@@ -3,67 +3,10 @@ import { Pressable, Text, TextInput, View } from "react-native";
 import { useRouter } from "expo-router";
 
 import { ResourceScreen } from "@/components/shared/resource-screen";
+import { agentStudentsFromBundle, type AgentStudentListItem, type AgentStudentsBundle } from "@/lib/agent/students";
 import { queryKeys } from "@/lib/query/keys";
 
-type AgentStudentInfoCard = {
-  airtableStudentId: string;
-  profileId: string | null;
-  name: string;
-  email: string;
-  status: string;
-  programMatchStatus: "matched" | "waiting" | "not_generated";
-};
-
-type AgentStudent = {
-  id: string;
-  name: string;
-  stage: string;
-  detail?: { email?: string | null };
-};
-
-type AgentStudentsBundle = {
-  students: {
-    meta: { total: number };
-    students: AgentStudent[];
-  };
-  info?: {
-    cards?: AgentStudentInfoCard[];
-  };
-};
-
-type StudentListItem = {
-  key: string;
-  name: string;
-  email: string;
-  status: string;
-  matchStatus: string;
-  profileId: string | null;
-};
-
-function bundleToListItems(data: AgentStudentsBundle): StudentListItem[] {
-  const cards = data.info?.cards;
-  if (cards && cards.length > 0) {
-    return cards.map((card) => ({
-      key: card.airtableStudentId || card.profileId || card.email,
-      name: card.name,
-      email: card.email,
-      status: card.status,
-      matchStatus: card.programMatchStatus.replace(/_/g, " "),
-      profileId: card.profileId,
-    }));
-  }
-
-  return data.students.students.map((student) => ({
-    key: student.id,
-    name: student.name,
-    email: student.detail?.email ?? "",
-    status: student.stage,
-    matchStatus: "—",
-    profileId: null,
-  }));
-}
-
-function filterStudents(items: StudentListItem[], query: string) {
+function filterStudents(items: AgentStudentListItem[], query: string) {
   const normalized = query.trim().toLowerCase();
   if (!normalized) return items;
 
@@ -80,7 +23,7 @@ function AgentStudentsList({ data }: { data: AgentStudentsBundle }) {
   const router = useRouter();
   const [filter, setFilter] = useState("");
 
-  const items = useMemo(() => bundleToListItems(data), [data]);
+  const items = useMemo(() => agentStudentsFromBundle(data), [data]);
   const filtered = useMemo(() => filterStudents(items, filter), [items, filter]);
 
   return (
@@ -108,8 +51,9 @@ function AgentStudentsList({ data }: { data: AgentStudentsBundle }) {
               key={item.key}
               onPress={() =>
                 router.push({
-                  pathname: "/(agent)/klara",
+                  pathname: "/(agent)/student-detail" as never,
                   params: {
+                    studentKey: item.key,
                     studentEmail: item.email,
                     studentProfileId: item.profileId ?? "",
                     studentName: item.name,
@@ -128,7 +72,7 @@ function AgentStudentsList({ data }: { data: AgentStudentsBundle }) {
                 </Text>
                 <Text className="text-xs text-muted">Match: {item.matchStatus}</Text>
               </View>
-              <Text className="mt-2 text-xs text-brand-mid">Open in Klara →</Text>
+              <Text className="mt-2 text-xs font-semibold text-brand-mid">Open student workspace →</Text>
             </Pressable>
           ))}
         </View>
@@ -138,12 +82,19 @@ function AgentStudentsList({ data }: { data: AgentStudentsBundle }) {
 }
 
 export default function AgentStudentsScreen() {
+  const router = useRouter();
+
   return (
     <ResourceScreen<AgentStudentsBundle>
       title="My Students"
       subtitle="Students linked to your partner account"
       queryKey={queryKeys.agentStudents()}
       path="/api/agent/students"
+      headerRight={
+        <Pressable onPress={() => router.push("/(agent)/add-student" as never)} className="rounded-xl bg-brand-mid px-3 py-2">
+          <Text className="text-xs font-bold text-white">+ Add student</Text>
+        </Pressable>
+      }
     >
       {(data) => <AgentStudentsList data={data} />}
     </ResourceScreen>

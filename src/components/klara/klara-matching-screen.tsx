@@ -57,6 +57,10 @@ type KlaraMatchingScreenProps = {
   studentProfileId?: string | null;
   studentName?: string | null;
   studentOptions?: StudentOption[];
+  /** Allow choosing a student while keeping general Klara chat available. */
+  showStudentPicker?: boolean;
+  /** Only the Matching tab needs a selected student; AI chat remains available. */
+  matchingRequiresTarget?: boolean;
   onClearStudent?: () => void;
   onPickStudent?: (student: StudentOption) => void;
 };
@@ -76,6 +80,8 @@ export function KlaraMatchingScreen({
   studentProfileId,
   studentName,
   studentOptions = [],
+  showStudentPicker = false,
+  matchingRequiresTarget = false,
   onClearStudent,
   onPickStudent,
 }: KlaraMatchingScreenProps) {
@@ -84,6 +90,7 @@ export function KlaraMatchingScreen({
   const queryClient = useQueryClient();
   const hasTarget = Boolean(studentEmail || studentProfileId);
   const blocked = requireStudentTarget && !hasTarget;
+  const matchingBlocked = matchingRequiresTarget && !hasTarget;
 
   const [tab, setTab] = useState<"chat" | "match">("chat");
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -122,7 +129,7 @@ export function KlaraMatchingScreen({
   }, [scopeKey, studentName]);
 
   async function loadStatus() {
-    if (blocked) return;
+    if (blocked || matchingBlocked) return;
     setStatusLoading(true);
     setStatusError(null);
     try {
@@ -144,7 +151,7 @@ export function KlaraMatchingScreen({
     if (blocked) return;
     void loadStatus();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [scopeKey, blocked]);
+  }, [scopeKey, blocked, matchingBlocked]);
 
   async function sendChat() {
     const text = input.trim();
@@ -329,12 +336,36 @@ export function KlaraMatchingScreen({
               </Text>
             </View>
           </View>
-          {requireStudentTarget && hasTarget ? (
+          {(requireStudentTarget || showStudentPicker) && hasTarget ? (
             <Pressable onPress={onClearStudent} className="rounded-xl bg-surface-end px-3 py-2">
-              <Text className="text-xs font-semibold text-text">Clear</Text>
+              <Text className="text-xs font-semibold text-text">Change</Text>
+            </Pressable>
+          ) : showStudentPicker ? (
+            <Pressable onPress={() => setPickerOpen((value) => !value)} className="rounded-xl bg-surface-end px-3 py-2">
+              <Text className="text-xs font-semibold text-text">Choose student</Text>
             </Pressable>
           ) : null}
         </View>
+
+        {showStudentPicker && pickerOpen ? (
+          <ScrollView className="mt-3 max-h-52" contentContainerClassName="gap-2 pb-2">
+            {studentOptions.length === 0 ? (
+              <Text className="text-sm text-muted">No students are available yet.</Text>
+            ) : studentOptions.map((student) => (
+              <Pressable
+                key={student.email || student.profileId || student.name}
+                onPress={() => {
+                  onPickStudent?.(student);
+                  setPickerOpen(false);
+                }}
+                className="rounded-xl border border-border bg-surface px-3 py-3"
+              >
+                <Text className="text-sm font-semibold text-text">{student.name}</Text>
+                <Text className="mt-1 text-xs text-muted">{student.email}</Text>
+              </Pressable>
+            ))}
+          </ScrollView>
+        ) : null}
 
         <View className="mt-3 flex-row gap-2">
           {(["chat", "match"] as const).map((key) => (
@@ -409,6 +440,17 @@ export function KlaraMatchingScreen({
             </Pressable>
           </View>
         </>
+      ) : matchingBlocked ? (
+        <View className="flex-1 items-center justify-center px-6">
+          <KlaraAvatar size={52} alt="" />
+          <Text className="mt-4 text-center text-lg font-bold text-text">Choose a student for matching</Text>
+          <Text className="mt-2 text-center text-sm leading-5 text-muted">
+            General AI chat works without a student. Program matching stays isolated to the selected student's profile.
+          </Text>
+          <Pressable onPress={() => setPickerOpen(true)} className="mt-5 rounded-xl bg-brand-mid px-5 py-3">
+            <Text className="text-sm font-bold text-white">Choose student</Text>
+          </Pressable>
+        </View>
       ) : (
         <ScrollView className="flex-1" contentContainerClassName="px-4 py-4 pb-10 gap-4">
           {statusLoading ? <ActivityIndicator color="#f6339a" /> : null}

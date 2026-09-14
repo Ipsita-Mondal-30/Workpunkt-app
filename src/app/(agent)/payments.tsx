@@ -1,6 +1,6 @@
 import { Alert, Text, View } from "react-native";
 import * as WebBrowser from "expo-web-browser";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { GradientButton } from "@/components/shared/gradient-button";
 import { ResourceScreen } from "@/components/shared/resource-screen";
@@ -36,6 +36,7 @@ const PLAN_LABELS: Record<EntitlementsMeSummary["agentPlan"]["label"], string> =
 };
 
 export default function AgentPaymentsScreen() {
+  const queryClient = useQueryClient();
   const checkout = useMutation({
     mutationFn: async () => {
       const response = await authFetch("/api/checkout/create-session", {
@@ -60,6 +61,7 @@ export default function AgentPaymentsScreen() {
     },
     onSuccess: async (url) => {
       await WebBrowser.openBrowserAsync(url);
+      await queryClient.invalidateQueries({ queryKey: queryKeys.entitlementsMe() });
     },
     onError: (error) => {
       Alert.alert("Checkout error", error.message);

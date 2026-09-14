@@ -4,8 +4,11 @@ import { useRouter } from "expo-router";
 import { GradientButton } from "@/components/shared/gradient-button";
 import { ResourceScreen } from "@/components/shared/resource-screen";
 import { StatsRow, type StatCard } from "@/components/shared/stats-row";
+import type { AgentNotification } from "@/lib/agent/notifications";
 import { useAuth } from "@/lib/auth/auth-context";
+import { openExternalUrl } from "@/lib/open-external-url";
 import { queryKeys } from "@/lib/query/keys";
+import { useApiQuery } from "@/lib/query/use-api";
 
 type AgentDashboardData = {
   recentActivity: {
@@ -23,14 +26,16 @@ type AgentDashboardData = {
 };
 
 const SHORTCUTS = [
+  { label: "Add Student", href: "/(agent)/add-student" },
   { label: "My Students", href: "/(agent)/students" },
   { label: "Ask Klara", href: "/(agent)/klara" },
   { label: "Training", href: "/(agent)/training" },
   { label: "Payments", href: "/(agent)/payments" },
   { label: "Message Team", href: "/(agent)/message-team" },
+  { label: "Notifications", href: "/(agent)/notifications" },
 ] as const;
 
-function buildDashboardStats(data: AgentDashboardData): StatCard[] {
+function buildDashboardStats(data: AgentDashboardData, unread: number): StatCard[] {
   const stats: StatCard[] = [
     {
       id: "training",
@@ -38,6 +43,12 @@ function buildDashboardStats(data: AgentDashboardData): StatCard[] {
       label: "Training progress",
       sub: `${data.training.mandatoryCompleted}/${data.training.mandatoryTotal} mandatory`,
       color: "pink",
+    },
+    {
+      id: "notifications",
+      value: String(unread),
+      label: "Unread notifications",
+      color: unread > 0 ? "pink" : "green",
     },
     {
       id: "activity",
@@ -62,6 +73,12 @@ function buildDashboardStats(data: AgentDashboardData): StatCard[] {
 export default function AgentHome() {
   const { profile } = useAuth();
   const router = useRouter();
+  const notifications = useApiQuery<AgentNotification[]>(
+    queryKeys.agentNotifications(),
+    "/api/agent/notifications",
+    { staleTime: 30_000 },
+  );
+  const unread = (notifications.data ?? []).filter((item) => !item.isRead).length;
 
   return (
     <ResourceScreen<AgentDashboardData>
@@ -74,7 +91,7 @@ export default function AgentHome() {
     >
       {(data) => (
         <>
-          <StatsRow stats={buildDashboardStats(data)} />
+          <StatsRow stats={buildDashboardStats(data, unread)} />
 
           {data.recentActivity.items.length > 0 ? (
             <View className="mb-4 gap-2">
@@ -87,6 +104,17 @@ export default function AgentHome() {
                   <Text className="text-sm font-semibold text-text">{item.name}</Text>
                   <Text className="mt-1 text-xs text-muted">{item.status}</Text>
                 </View>
+              ))}
+            </View>
+          ) : null}
+
+          {data.partnerDocuments.signedContract || data.partnerDocuments.feeReceipt ? (
+            <View className="mb-4 rounded-2xl border border-border bg-surface px-4 py-4">
+              <Text className="mb-3 text-sm font-semibold text-text">Partner documents</Text>
+              {[data.partnerDocuments.signedContract, data.partnerDocuments.feeReceipt].filter(Boolean).map((document) => (
+                <Pressable key={document!.downloadUrl} onPress={() => void openExternalUrl(document!.downloadUrl)} className="mb-2 rounded-xl bg-surface-end px-3 py-3">
+                  <Text className="text-sm font-semibold text-brand-mid">{document!.fileName || "Open document"} →</Text>
+                </Pressable>
               ))}
             </View>
           ) : null}

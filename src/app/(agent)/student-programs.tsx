@@ -1,4 +1,5 @@
-import { Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
+import { useRouter } from "expo-router";
 
 import { ResourceScreen } from "@/components/shared/resource-screen";
 import { queryKeys } from "@/lib/query/keys";
@@ -21,6 +22,8 @@ type AgentStudentProgramsData = {
 };
 
 export default function AgentStudentProgramsScreen() {
+  const router = useRouter();
+
   return (
     <ResourceScreen<AgentStudentProgramsData>
       title="Student Programs"
@@ -36,8 +39,17 @@ export default function AgentStudentProgramsScreen() {
             </View>
           ) : (
             data.rows.map((row) => (
-              <View
+              <Pressable
                 key={row.airtableStudentId}
+                onPress={() => router.push({
+                  pathname: "/(agent)/student-detail" as never,
+                  params: {
+                    studentKey: row.airtableStudentId,
+                    studentEmail: row.email,
+                    studentProfileId: row.profileId ?? "",
+                    studentName: row.name,
+                  },
+                })}
                 className="rounded-2xl border border-border bg-surface px-4 py-4"
               >
                 <Text className="text-base font-semibold text-text">{row.name}</Text>
@@ -66,7 +78,8 @@ export default function AgentStudentProgramsScreen() {
                 ) : (
                   <Text className="mt-2 text-xs text-muted">No programs listed yet.</Text>
                 )}
-              </View>
+                <Text className="mt-3 text-xs font-semibold text-brand-mid">Open student workspace →</Text>
+              </Pressable>
             ))
           )}
         </View>

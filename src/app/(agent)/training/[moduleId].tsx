@@ -4,6 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 
 import { GradientButton } from "@/components/shared/gradient-button";
 import { WorkpunktLoader } from "@/components/shared/workpunkt-loader";
+import { openExternalUrl } from "@/lib/open-external-url";
 import { queryKeys } from "@/lib/query/keys";
 import { useApiMutation, useApiQuery } from "@/lib/query/use-api";
 
@@ -58,6 +59,7 @@ export default function AgentTrainingModuleScreen() {
 
   const module = findModule(trainingQuery.data, moduleId ?? "");
   const isComplete = module?.status === "completed" || Boolean(module?.completedAt);
+  const isLocked = module?.status === "locked";
 
   if (trainingQuery.isLoading && !trainingQuery.data) {
     return <WorkpunktLoader />;
@@ -95,16 +97,14 @@ export default function AgentTrainingModuleScreen() {
       ) : null}
 
       {module.contentUrl ? (
-        <View className="mt-4 rounded-2xl border border-border bg-surface px-4 py-3">
+        <Pressable onPress={() => void openExternalUrl(module.contentUrl!)} className="mt-4 rounded-2xl border border-border bg-surface px-4 py-3">
           <Text className="text-xs text-muted">Content URL</Text>
-          <Text className="mt-1 text-sm text-brand-mid" numberOfLines={2}>
-            {module.contentUrl}
-          </Text>
-        </View>
+          <Text className="mt-1 text-sm font-semibold text-brand-mid">Open training content →</Text>
+        </Pressable>
       ) : null}
 
       {module.linkUrl ? (
-        <Pressable className="mt-3 rounded-xl border border-border bg-surface px-4 py-3">
+        <Pressable onPress={() => void openExternalUrl(module.linkUrl!)} className="mt-3 rounded-xl border border-border bg-surface px-4 py-3">
           <Text className="text-sm font-semibold text-brand-mid">
             {module.linkLabel ?? "Open resource"}
           </Text>
@@ -116,7 +116,11 @@ export default function AgentTrainingModuleScreen() {
       ) : null}
 
       <View className="mt-8">
-        {isComplete ? (
+        {isLocked ? (
+          <View className="rounded-2xl border border-warning/20 bg-warning/10 px-4 py-3">
+            <Text className="text-sm font-semibold text-warning">Complete the required earlier modules to unlock this one.</Text>
+          </View>
+        ) : isComplete ? (
           <View className="rounded-2xl border border-border bg-success/10 px-4 py-3">
             <Text className="text-sm font-semibold text-success">Module completed</Text>
           </View>
