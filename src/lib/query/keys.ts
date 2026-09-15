@@ -20,6 +20,7 @@ export const queryKeys = {
   adminStudentPipeline: () => ["admin", "student-pipeline"] as const,
   adminApplicationsOps: () => ["admin", "applications-ops"] as const,
   adminAgentsPartners: () => ["admin", "agents-partners"] as const,
+  adminCommandCentre: () => ["admin", "command-centre"] as const,
   adminEmailLogs: (after?: string | null) =>
     ["admin", "email-logs", after ?? "first"] as const,
   adminEmailLog: (id: string) => ["admin", "email-logs", "detail", id] as const,

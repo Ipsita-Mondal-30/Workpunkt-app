@@ -50,8 +50,58 @@ export function PortalHero({ eyebrow, title, description, children }: { eyebrow:
   return <View className="mb-6 overflow-hidden rounded-3xl border border-brand-start/20"><LinearGradient colors={isDark ? ["#291637", "#32172d", "#301d19"] : ["#f0e5ff", "#ffe8f3", "#fff0df"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={{ padding: 24 }}><View pointerEvents="none" accessible={false} style={{ position: "absolute", right: -45, top: -65, width: 190, height: 190, borderRadius: 95, borderWidth: 1, borderColor: "rgba(186,67,237,0.15)" }} /><Text className="text-[10px] font-bold uppercase tracking-[2px] text-brand-start">{eyebrow}</Text><Text className="mt-3 max-w-2xl text-3xl font-bold tracking-tight text-text">{title}</Text><Text className="mt-3 max-w-2xl text-sm leading-6 text-muted">{description}</Text>{children ? <View className="mt-5">{children}</View> : null}</LinearGradient></View>;
 }
 
-export function ActionTile({ title, description, icon, onPress }: { title: string; description: string; icon: PortalIconName; onPress: () => void }) {
-  return <Pressable accessibilityRole="button" onPress={onPress} style={({ pressed }) => ({ opacity: pressed ? 0.72 : 1, flexGrow: 1, flexShrink: 1, flexBasis: 240 })} className="flex-row items-center gap-4 rounded-2xl border border-border bg-surface p-4"><View className="h-11 w-11 items-center justify-center rounded-2xl bg-brand-start/10"><PortalIcon name={icon} /></View><View className="flex-1"><Text className="text-sm font-bold text-text">{title}</Text><Text className="mt-1 text-xs leading-5 text-muted">{description}</Text></View><PortalIcon name="arrow" size={16} /></Pressable>;
+export function ActionTile({
+  title,
+  description,
+  icon,
+  onPress,
+  width,
+  variant = "row",
+}: {
+  title: string;
+  description: string;
+  icon: PortalIconName;
+  onPress: () => void;
+  /** Fixed width for horizontal rails (disables flex grow/wrap sizing). */
+  width?: number;
+  /** `rail` stacks content for peek carousels; `row` is the default list tile. */
+  variant?: "row" | "rail";
+}) {
+  const isRail = variant === "rail";
+  return (
+    <Pressable
+      accessibilityRole="button"
+      onPress={onPress}
+      style={({ pressed }) => ({
+        opacity: pressed ? 0.72 : 1,
+        width: width ?? undefined,
+        flexGrow: width != null ? 0 : 1,
+        flexShrink: width != null ? 0 : 1,
+        flexBasis: width != null ? undefined : 240,
+        minHeight: isRail ? 148 : undefined,
+      })}
+      className={
+        isRail
+          ? "justify-between rounded-2xl border border-border bg-surface p-4"
+          : "flex-row items-center gap-4 rounded-2xl border border-border bg-surface p-4"
+      }
+    >
+      <View className="h-11 w-11 items-center justify-center rounded-2xl bg-brand-start/10">
+        <PortalIcon name={icon} />
+      </View>
+      <View className={isRail ? "mt-3 flex-1" : "flex-1"}>
+        <Text className="text-sm font-bold text-text" numberOfLines={2}>
+          {title}
+        </Text>
+        <Text className="mt-1 text-xs leading-5 text-muted" numberOfLines={isRail ? 3 : 2}>
+          {description}
+        </Text>
+      </View>
+      <View className={isRail ? "mt-3 items-end" : undefined}>
+        <PortalIcon name="arrow" size={16} />
+      </View>
+    </Pressable>
+  );
 }
 
 export function ProgressBar({ value, label }: { value: number; label: string }) {
