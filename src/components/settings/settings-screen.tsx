@@ -3,6 +3,7 @@ import { useRouter } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 
 import { useAuth } from "@/lib/auth/auth-context";
+import { getApiBaseUrl } from "@/lib/config/public-env";
 import {
   LEGAL_CONTACT_EMAIL,
   LEGAL_COMPANY,
@@ -13,9 +14,7 @@ import { useTheme } from "@/lib/theme/theme-context";
 import { PageHeading, PortalCard, PortalPage } from "@/components/portal/portal-ui";
 
 function siteBaseUrl() {
-  const apiUrl = process.env.EXPO_PUBLIC_API_URL?.replace(/\/$/, "");
-  if (apiUrl) return apiUrl;
-  return LEGAL_COMPANY.website.replace(/\/$/, "");
+  return getApiBaseUrl() || LEGAL_COMPANY.website.replace(/\/$/, "");
 }
 
 export function SettingsScreen() {

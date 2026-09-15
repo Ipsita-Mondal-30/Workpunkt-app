@@ -10,12 +10,18 @@
     "ios": {
       "icon": "./assets/expo.icon",
       "bundleIdentifier": "com.workpunkt.app",
+      "infoPlist": {
+        "NSAppTransportSecurity": {
+          "NSAllowsLocalNetworking": true
+        }
+      },
       "associatedDomains": [
         "applinks:workpunkt.com",
         "applinks:www.workpunkt.com"
       ]
     },
     "android": {
+      "usesCleartextTraffic": true,
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",

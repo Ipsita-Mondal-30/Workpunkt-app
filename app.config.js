@@ -27,8 +27,13 @@ function loadDotEnv(filePath) {
 module.exports = () => {
   const env = loadDotEnv(path.join(__dirname, ".env"));
 
-  const apiUrl = env.EXPO_PUBLIC_API_URL ?? "http://localhost:3001";
-  const signupUrl = env.EXPO_PUBLIC_SIGNUP_URL ?? `${apiUrl}/login`;
+  const apiUrl = (env.EXPO_PUBLIC_API_URL ?? "http://localhost:3001").replace(
+    /\/$/,
+    "",
+  );
+  const signupUrl = (
+    env.EXPO_PUBLIC_SIGNUP_URL ?? `${apiUrl}/login`
+  ).replace(/([^:]\/)\/+/g, "$1");
 
   // Mirror into process.env so Metro inlines EXPO_PUBLIC_* on every config reload.
   process.env.EXPO_PUBLIC_API_URL = apiUrl;
@@ -38,6 +43,10 @@ module.exports = () => {
   }
   if (env.EXPO_PUBLIC_SUPABASE_ANON_KEY) {
     process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY = env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
+  }
+
+  if (process.env.NODE_ENV !== "production") {
+    console.log(`[app.config] EXPO_PUBLIC_API_URL=${apiUrl}`);
   }
 
   return {

@@ -1,9 +1,5 @@
 import { supabase } from "@/lib/supabase/client";
-
-const apiBase = (process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:3001").replace(
-  /\/$/,
-  "",
-);
+import { formatApiNetworkError, getApiBaseUrl } from "@/lib/config/public-env";
 
 export async function getAccessToken(): Promise<string | null> {
   const {
@@ -26,6 +22,7 @@ export async function authFetch(
     throw new Error("Not authenticated");
   }
 
+  const apiBase = getApiBaseUrl();
   const url = path.startsWith("http") ? path : `${apiBase}${path}`;
   const headers = new Headers(init?.headers);
   headers.set("Authorization", `Bearer ${token}`);
@@ -35,18 +32,24 @@ export async function authFetch(
 
   console.log("[authFetch]", init?.method ?? "GET", url);
 
-  const response = await fetch(url, {
-    ...init,
-    headers,
-  });
-
-  if (!response.ok) {
-    console.error("[authFetch] error", {
-      url,
-      status: response.status,
-      statusText: response.statusText,
+  try {
+    const response = await fetch(url, {
+      ...init,
+      headers,
     });
-  }
 
-  return response;
+    if (!response.ok) {
+      console.error("[authFetch] error", {
+        url,
+        status: response.status,
+        statusText: response.statusText,
+      });
+    }
+
+    return response;
+  } catch (error) {
+    const message = formatApiNetworkError(error, apiBase);
+    console.error("[authFetch] network failure", { url, message, error });
+    throw new Error(message);
+  }
 }

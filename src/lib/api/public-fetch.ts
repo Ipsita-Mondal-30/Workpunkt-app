@@ -1,20 +1,24 @@
-const apiBase = (process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:3001").replace(
-  /\/$/,
-  "",
-);
+import { formatApiNetworkError, getApiBaseUrl } from "@/lib/config/public-env";
 
 /** Unauthenticated fetch to the Workpunkt Next.js API (signup / apply). */
 export async function publicFetch(path: string, init?: RequestInit): Promise<Response> {
+  const apiBase = getApiBaseUrl();
   const url = path.startsWith("http") ? path : `${apiBase}${path}`;
   const headers = new Headers(init?.headers);
   if (!headers.has("Content-Type") && init?.body) {
     headers.set("Content-Type", "application/json");
   }
 
-  return fetch(url, {
-    ...init,
-    headers,
-  });
+  try {
+    return await fetch(url, {
+      ...init,
+      headers,
+    });
+  } catch (error) {
+    const message = formatApiNetworkError(error, apiBase);
+    console.error("[publicFetch] network failure", { url, message, error });
+    throw new Error(message);
+  }
 }
 
 export async function publicPostJson<T>(
