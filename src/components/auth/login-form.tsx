@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -7,11 +7,13 @@ import {
   Text,
   TextInput,
   View,
+  type TextInput as TextInputType,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { PasswordField } from "@/components/auth/password-field";
 import { GradientButton } from "@/components/shared/gradient-button";
 import { WorkpunktLogo } from "@/components/shared/workpunkt-logo";
 import { useAuth } from "@/lib/auth/auth-context";
@@ -27,6 +29,17 @@ const SIGNUP_ROLES: SignupRole[] = [
   { label: "Sign up as partner", href: "/(auth)/signup/agent" },
   { label: "Sign up as school counsellor", href: "/(auth)/signup/counsellor" },
 ];
+
+function formatAuthError(message: string) {
+  const lower = message.toLowerCase();
+  if (lower.includes("invalid login credentials") || lower.includes("invalid_credentials")) {
+    return "Email or password is incorrect. Please try again.";
+  }
+  if (lower.includes("email not confirmed")) {
+    return "Please confirm your email before signing in.";
+  }
+  return message;
+}
 
 function OutlineLinkButton({
   label,
@@ -80,6 +93,8 @@ export function LoginForm() {
   const { signIn } = useAuth();
   const { isDark } = useTheme();
   const router = useRouter();
+  const scrollRef = useRef<ScrollView>(null);
+  const passwordRef = useRef<TextInputType>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -106,7 +121,8 @@ export function LoginForm() {
     setLoading(false);
 
     if (result.error) {
-      setError(result.error);
+      setError(formatAuthError(result.error));
+      scrollRef.current?.scrollTo({ y: 0, animated: true });
       return;
     }
 
@@ -126,17 +142,23 @@ export function LoginForm() {
         style={{ flex: 1 }}
       >
         <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
           style={{ flex: 1 }}
+          keyboardVerticalOffset={Platform.OS === "ios" ? 8 : 0}
         >
           <ScrollView
+            ref={scrollRef}
             contentContainerStyle={{
               flexGrow: 1,
               justifyContent: "center",
               paddingHorizontal: 20,
-              paddingVertical: 28,
+              paddingTop: 28,
+              paddingBottom: 48,
             }}
             keyboardShouldPersistTaps="handled"
+            keyboardDismissMode="on-drag"
+            automaticallyAdjustKeyboardInsets
+            showsVerticalScrollIndicator={false}
           >
             <View style={{ marginBottom: 20, alignItems: "flex-start" }}>
               <WorkpunktLogo fontSize={34} />
@@ -185,7 +207,9 @@ export function LoginForm() {
                     paddingVertical: 10,
                   }}
                 >
-                  <Text style={{ fontSize: 13, color: "#dc2626" }}>{error}</Text>
+                  <Text style={{ fontSize: 13, color: "#dc2626", lineHeight: 18 }}>
+                    {error}
+                  </Text>
                 </View>
               ) : null}
 
@@ -205,11 +229,15 @@ export function LoginForm() {
                   <TextInput
                     autoCapitalize="none"
                     autoComplete="email"
+                    autoCorrect={false}
                     keyboardType="email-address"
                     placeholder="email@example.com"
                     placeholderTextColor={placeholderColor}
                     value={email}
                     onChangeText={setEmail}
+                    returnKeyType="next"
+                    onSubmitEditing={() => passwordRef.current?.focus()}
+                    blurOnSubmit={false}
                     style={{
                       height: 56,
                       borderRadius: 16,
@@ -223,37 +251,34 @@ export function LoginForm() {
                   />
                 </View>
 
-                <View style={{ gap: 6 }}>
-                  <Text
-                    style={{
-                      fontSize: 11,
-                      fontWeight: "700",
-                      letterSpacing: 1.2,
-                      textTransform: "uppercase",
-                      color: mutedColor,
-                    }}
-                  >
-                    Password
-                  </Text>
-                  <TextInput
-                    secureTextEntry
-                    autoComplete="password"
-                    placeholder="Password"
-                    placeholderTextColor={placeholderColor}
-                    value={password}
-                    onChangeText={setPassword}
-                    style={{
-                      height: 56,
-                      borderRadius: 16,
-                      borderWidth: 1,
-                      borderColor: inputBorder,
-                      backgroundColor: inputBg,
-                      paddingHorizontal: 16,
-                      fontSize: 16,
-                      color: textColor,
-                    }}
-                  />
-                </View>
+                <PasswordField
+                  ref={passwordRef}
+                  label="Password"
+                  isDark={isDark}
+                  autoComplete="password"
+                  placeholder="Password"
+                  placeholderTextColor={placeholderColor}
+                  value={password}
+                  onChangeText={setPassword}
+                  returnKeyType="go"
+                  onSubmitEditing={() => void onSubmit()}
+                  onFocus={() => {
+                    // Keep password + button above the keyboard on smaller screens.
+                    setTimeout(() => {
+                      scrollRef.current?.scrollToEnd({ animated: true });
+                    }, 100);
+                  }}
+                  style={{
+                    height: 56,
+                    borderRadius: 16,
+                    borderWidth: 1,
+                    borderColor: inputBorder,
+                    backgroundColor: inputBg,
+                    paddingHorizontal: 16,
+                    fontSize: 16,
+                    color: textColor,
+                  }}
+                />
               </View>
 
               <GradientButton

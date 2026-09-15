@@ -1,7 +1,8 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
-import { Text, TextInput, View } from "react-native";
+import { Text, View } from "react-native";
 
+import { PasswordField } from "@/components/auth/password-field";
 import { SignupShell } from "@/components/auth/signup-shell";
 import { GradientButton } from "@/components/shared/gradient-button";
 import { publicPostJson } from "@/lib/api/public-fetch";
@@ -62,16 +63,16 @@ export default function PartnerActivateScreen() {
         </View>
       ) : null}
 
-      <TextInput
-        secureTextEntry
+      <PasswordField
+        isDark={isDark}
         placeholder="Password"
         placeholderTextColor={placeholderColor}
         value={password}
         onChangeText={setPassword}
         className="mb-3 rounded-2xl border border-border bg-surface px-4 py-4 text-base text-text"
       />
-      <TextInput
-        secureTextEntry
+      <PasswordField
+        isDark={isDark}
         placeholder="Confirm password"
         placeholderTextColor={placeholderColor}
         value={confirmPassword}
