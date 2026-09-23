@@ -67,7 +67,6 @@ export function ActionTile({
   /** `rail` stacks content for peek carousels; `row` is the default list tile. */
   variant?: "row" | "rail";
 }) {
-<<<<<<< HEAD
   const { isDark } = useTheme();
   const isRail = variant === "rail";
   const textColor = isDark ? "#ffffff" : "#0e0b11";
@@ -80,12 +79,6 @@ export function ActionTile({
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={`${title}. ${description}`}
-=======
-  const isRail = variant === "rail";
-  return (
-    <Pressable
-      accessibilityRole="button"
->>>>>>> c6ee1f8a7e590413977de4e7294a973f477b3d10
       onPress={onPress}
       style={({ pressed }) => ({
         opacity: pressed ? 0.72 : 1,
@@ -93,7 +86,6 @@ export function ActionTile({
         flexGrow: width != null ? 0 : 1,
         flexShrink: width != null ? 0 : 1,
         flexBasis: width != null ? undefined : 240,
-<<<<<<< HEAD
         minHeight: isRail ? 156 : undefined,
         flexDirection: isRail ? "column" : "row",
         alignItems: isRail ? "stretch" : "center",
@@ -148,28 +140,6 @@ export function ActionTile({
           alignItems: isRail ? "flex-end" : "center",
         }}
       >
-=======
-        minHeight: isRail ? 148 : undefined,
-      })}
-      className={
-        isRail
-          ? "justify-between rounded-2xl border border-border bg-surface p-4"
-          : "flex-row items-center gap-4 rounded-2xl border border-border bg-surface p-4"
-      }
-    >
-      <View className="h-11 w-11 items-center justify-center rounded-2xl bg-brand-start/10">
-        <PortalIcon name={icon} />
-      </View>
-      <View className={isRail ? "mt-3 flex-1" : "flex-1"}>
-        <Text className="text-sm font-bold text-text" numberOfLines={2}>
-          {title}
-        </Text>
-        <Text className="mt-1 text-xs leading-5 text-muted" numberOfLines={isRail ? 3 : 2}>
-          {description}
-        </Text>
-      </View>
-      <View className={isRail ? "mt-3 items-end" : undefined}>
->>>>>>> c6ee1f8a7e590413977de4e7294a973f477b3d10
         <PortalIcon name="arrow" size={16} />
       </View>
     </Pressable>

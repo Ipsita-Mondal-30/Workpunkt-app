@@ -31,7 +31,6 @@ export function StatsRow({
   /** Prefer horizontal peek rail on narrow admin/home layouts. */
   scrollable?: boolean;
 }) {
-<<<<<<< HEAD
   const { isDark } = useTheme();
   const { width: windowWidth } = useWindowDimensions();
   const textColor = isDark ? "#ffffff" : "#0e0b11";
@@ -84,26 +83,6 @@ export function StatsRow({
     return (
       <View style={{ marginBottom: 24, flexDirection: "row", flexWrap: "wrap", gap: 12 }}>
         {stats.map((stat) => renderCard(stat))}
-=======
-  const { width: windowWidth } = useWindowDimensions();
-
-  if (!stats.length) return null;
-
-  if (!scrollable) {
-    return (
-      <View className="mb-6 flex-row flex-wrap gap-3">
-        {stats.map((stat) => (
-          <View
-            key={stat.id}
-            className="min-w-[140px] flex-1 rounded-2xl border border-border bg-surface px-4 py-5"
-          >
-            <View className={cn("mb-4 h-1 w-7 rounded-full", COLOR_MAP[stat.color ?? "purple"])} />
-            <Text className="text-2xl font-bold tracking-tight text-text">{stat.value}</Text>
-            <Text className="mt-1 text-xs font-semibold text-text">{stat.label}</Text>
-            {stat.sub ? <Text className="mt-1 text-xs text-muted">{stat.sub}</Text> : null}
-          </View>
-        ))}
->>>>>>> c6ee1f8a7e590413977de4e7294a973f477b3d10
       </View>
     );
   }
@@ -111,11 +90,7 @@ export function StatsRow({
   const cardWidth = Math.max(148, windowWidth - PAGE_GUTTER - NEXT_PEEK);
 
   return (
-<<<<<<< HEAD
     <View style={{ marginBottom: 24, marginHorizontal: -PAGE_GUTTER }}>
-=======
-    <View className="mb-6" style={{ marginHorizontal: -PAGE_GUTTER }}>
->>>>>>> c6ee1f8a7e590413977de4e7294a973f477b3d10
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -128,22 +103,7 @@ export function StatsRow({
           gap: CARD_GAP,
         }}
       >
-<<<<<<< HEAD
         {stats.map((stat) => renderCard(stat, cardWidth))}
-=======
-        {stats.map((stat) => (
-          <View
-            key={stat.id}
-            style={{ width: cardWidth }}
-            className="rounded-2xl border border-border bg-surface px-4 py-5"
-          >
-            <View className={cn("mb-4 h-1 w-7 rounded-full", COLOR_MAP[stat.color ?? "purple"])} />
-            <Text className="text-2xl font-bold tracking-tight text-text">{stat.value}</Text>
-            <Text className="mt-1 text-xs font-semibold text-text">{stat.label}</Text>
-            {stat.sub ? <Text className="mt-1 text-xs text-muted">{stat.sub}</Text> : null}
-          </View>
-        ))}
->>>>>>> c6ee1f8a7e590413977de4e7294a973f477b3d10
       </ScrollView>
     </View>
   );
