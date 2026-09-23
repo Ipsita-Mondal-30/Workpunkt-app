@@ -8,7 +8,7 @@ import {
   formatPhoneNumber,
   parsePhoneNumber,
 } from "@/lib/phone/phone-number";
-import { useTheme } from "@/lib/theme/theme-context";
+import { useThemeColors } from "@/lib/theme/theme-context";
 import { cn } from "@/lib/utils";
 
 type PhoneNumberInputProps = {
@@ -26,9 +26,8 @@ export function PhoneNumberInput({
   hasError = false,
   disabled = false,
 }: PhoneNumberInputProps) {
-  const { isDark } = useTheme();
+  const colors = useThemeColors();
   const [pickerOpen, setPickerOpen] = useState(false);
-  const placeholderColor = isDark ? "#a1a1aa" : "#71717a";
   const parsed = useMemo(
     () => parsePhoneNumber(value, DEFAULT_PHONE_COUNTRY_CODE),
     [value],
@@ -59,7 +58,7 @@ export function PhoneNumberInput({
           autoComplete="tel-national"
           editable={!disabled}
           placeholder={placeholder}
-          placeholderTextColor={placeholderColor}
+          placeholderTextColor={colors.placeholder}
           value={parsed.nationalNumber}
           onChangeText={(raw: string) => {
             if (raw.includes("+")) {

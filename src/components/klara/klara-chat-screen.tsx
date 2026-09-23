@@ -12,7 +12,7 @@ import { GradientButton } from "@/components/shared/gradient-button";
 import { KlaraAvatar } from "@/components/shared/klara-avatar";
 import { authFetch } from "@/lib/api/auth-fetch";
 import { AI_CHAT_WELCOME_MESSAGE } from "@/lib/klara/faq-presets";
-import { useTheme } from "@/lib/theme/theme-context";
+import { useThemeColors } from "@/lib/theme/theme-context";
 import { createUuid } from "@/lib/utils";
 
 type ChatMessage = {
@@ -22,8 +22,7 @@ type ChatMessage = {
 };
 
 export function KlaraChatScreen({ subtitle }: { subtitle?: string }) {
-  const { isDark } = useTheme();
-  const placeholderColor = isDark ? "#a1a1aa" : "#71717a";
+  const colors = useThemeColors();
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: "welcome",
@@ -123,7 +122,7 @@ export function KlaraChatScreen({ subtitle }: { subtitle?: string }) {
               className={
                 item.role === "user"
                   ? "rounded-2xl bg-brand-mid px-4 py-3"
-                  : "rounded-2xl bg-surface-end px-4 py-3"
+                  : "rounded-2xl border border-border bg-surface px-4 py-3"
               }
             >
               <Text
@@ -143,9 +142,14 @@ export function KlaraChatScreen({ subtitle }: { subtitle?: string }) {
           value={input}
           onChangeText={setInput}
           placeholder="Ask Klara…"
-          placeholderTextColor={placeholderColor}
+          placeholderTextColor={colors.placeholder}
           multiline
-          className="mb-3 max-h-28 rounded-2xl border border-border bg-surface px-4 py-3 text-base text-text"
+          className="mb-3 max-h-28 rounded-2xl border border-border px-4 py-3 text-base text-text"
+          style={{
+            backgroundColor: colors.inputBg,
+            borderColor: colors.border,
+            color: colors.text,
+          }}
         />
         <GradientButton
           text={sending ? "Sending…" : "Send"}

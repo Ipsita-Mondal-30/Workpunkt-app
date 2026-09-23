@@ -37,7 +37,7 @@ import { formatKlaraReplyForDisplay } from "@/lib/klara/format-klara-reply";
 import { QUALIFIER_QUESTIONS } from "@/lib/klara/qualifier-questions";
 import { streamRevealText } from "@/lib/klara/stream-reveal-text";
 import { fetchApiJson, postApiJson } from "@/lib/query/use-api";
-import { useTheme } from "@/lib/theme/theme-context";
+import { useThemeColors } from "@/lib/theme/theme-context";
 import { cn, createUuid } from "@/lib/utils";
 
 export type KlaraChatMode = "faq" | "ai" | "counsellor";
@@ -105,8 +105,7 @@ export function KlaraChatSheet({
   const router = useRouter();
   const pathname = usePathname();
   const { user } = useAuth();
-  const { isDark } = useTheme();
-  const placeholderColor = isDark ? "#a1a1aa" : "#71717a";
+  const colors = useThemeColors();
 
   const showMatching = role === "student" && !aiOnly;
   const inboxKind = role === "agent" || role === "counsellor" ? "agent_chat" : "student_help";
@@ -619,7 +618,7 @@ export function KlaraChatSheet({
               {showMatching ? (
                 <View className="mb-2 gap-2">
                   {qualifierLoading ? (
-                    <ActivityIndicator color="#f6339a" />
+                    <ActivityIndicator color={colors.brandMid} />
                   ) : (
                     <>
                       {!qualifier?.completed || showQualifier ? (
@@ -702,7 +701,7 @@ export function KlaraChatSheet({
             <ScrollView contentContainerClassName="pb-4">
                   {inboxLoading ? (
                 <View className="mt-6 items-center">
-                  <ActivityIndicator color="#f6339a" />
+                  <ActivityIndicator color={colors.brandMid} />
                 </View>
               ) : (inbox?.messages?.length ?? 0) === 0 ? (
                 <View className="rounded-2xl border border-border bg-surface px-4 py-6">
@@ -736,9 +735,14 @@ export function KlaraChatSheet({
               placeholder={
                 mode === "ai" ? "Ask Klara anything…" : "Message a counsellor…"
               }
-              placeholderTextColor={placeholderColor}
+              placeholderTextColor={colors.placeholder}
               multiline
-              className="max-h-28 min-h-[44px] flex-1 rounded-2xl border border-border bg-surface px-3 py-2.5 text-sm text-text"
+              className="max-h-28 min-h-[44px] flex-1 rounded-2xl border border-border px-3 py-2.5 text-sm text-text"
+              style={{
+                backgroundColor: colors.inputBg,
+                borderColor: colors.border,
+                color: colors.text,
+              }}
             />
             <Pressable
               disabled={

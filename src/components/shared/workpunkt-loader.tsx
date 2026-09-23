@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { Animated, View } from "react-native";
 
 import { WorkpunktLogo } from "@/components/shared/workpunkt-logo";
+import { useThemeColors } from "@/lib/theme/theme-context";
 import { cn } from "@/lib/utils";
 
 export type WorkpunktLoaderProps = {
@@ -17,6 +18,7 @@ export function WorkpunktLoader({
   centered = true,
   label = "Loading",
 }: WorkpunktLoaderProps) {
+  const colors = useThemeColors();
   const opacity = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
@@ -42,10 +44,8 @@ export function WorkpunktLoader({
     <View
       accessibilityLabel={label}
       accessibilityRole="progressbar"
-      className={cn(
-        centered && "flex-1 items-center justify-center bg-bg",
-        className,
-      )}
+      className={cn(centered && "flex-1 items-center justify-center", className)}
+      style={centered ? { backgroundColor: colors.bg } : undefined}
     >
       <Animated.View style={{ opacity }}>
         <WorkpunktLogo fontSize={fontSize} />

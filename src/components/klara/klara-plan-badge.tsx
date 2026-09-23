@@ -1,5 +1,6 @@
 import { Text, View } from "react-native";
 
+import { useThemeColors } from "@/lib/theme/theme-context";
 import { cn } from "@/lib/utils";
 
 type KlaraPlanBadgeProps = {
@@ -16,6 +17,7 @@ export function KlaraPlanBadge({
   agentLabel = null,
   agentCreditsRemaining = null,
 }: KlaraPlanBadgeProps) {
+  const colors = useThemeColors();
   const isAgentBadge = Boolean(agentLabel);
   const label = isAgentBadge
     ? agentCreditsRemaining != null
@@ -31,11 +33,10 @@ export function KlaraPlanBadge({
 
   return (
     <View
-      className={cn(
-        "self-start rounded-full px-2.5 py-1",
-        isPlus ? "bg-brand-mid/15" : "bg-surface-end",
-        className,
-      )}
+      className={cn("self-start rounded-full px-2.5 py-1", className)}
+      style={{
+        backgroundColor: isPlus ? `${colors.brandMid}26` : colors.surfaceEnd,
+      }}
     >
       <Text
         className={cn(

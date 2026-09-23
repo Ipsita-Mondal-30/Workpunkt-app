@@ -8,19 +8,32 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { useColorScheme as useNativeWindColorScheme } from "nativewind";
-import { Appearance } from "react-native";
+import { View } from "react-native";
+import { useColorScheme as useNativeWindColorScheme, vars } from "nativewind";
 
 import { bootError, bootLog, bootWarn } from "@/lib/debug/boot-log";
+import {
+  getThemeColors,
+  getThemeCssVars,
+  type ThemeColors,
+  type ThemePreference,
+} from "@/lib/theme/theme-colors";
 
-export type ThemePreference = "light" | "dark";
+export type { ThemePreference } from "@/lib/theme/theme-colors";
 
 export const THEME_STORAGE_KEY = "workpunkt-theme";
+
+/**
+ * Appearance toggle stays hidden in Settings for now.
+ * While hidden, the app always boots into dark mode.
+ */
+export const FORCE_DARK_DEFAULT = true;
 
 type ThemeContextValue = {
   theme: ThemePreference;
   isDark: boolean;
   ready: boolean;
+  colors: ThemeColors;
   setTheme: (theme: ThemePreference) => Promise<void>;
   toggleTheme: () => Promise<void>;
 };
@@ -28,8 +41,7 @@ type ThemeContextValue = {
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 function resolveInitialTheme(): ThemePreference {
-  const system = Appearance.getColorScheme();
-  return system === "dark" ? "dark" : "light";
+  return FORCE_DARK_DEFAULT ? "dark" : "light";
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
@@ -52,6 +64,17 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
     void (async () => {
       try {
+        if (FORCE_DARK_DEFAULT) {
+          applyTheme("dark");
+          try {
+            await AsyncStorage.setItem(THEME_STORAGE_KEY, "dark");
+          } catch (error) {
+            bootWarn("theme:force-dark-persist-failed", error);
+          }
+          bootLog("theme:load-ok", { forcedDark: true });
+          return;
+        }
+
         const stored = await AsyncStorage.getItem(THEME_STORAGE_KEY);
         if (!mounted) return;
         if (stored === "dark" || stored === "light") {
@@ -61,8 +84,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         }
         bootLog("theme:load-ok", { stored });
       } catch (error) {
-        bootWarn("theme:load-failed — falling back to system", error);
-        applyTheme(resolveInitialTheme());
+        bootWarn("theme:load-failed — falling back to dark", error);
+        applyTheme("dark");
       } finally {
         if (mounted) {
           setReady(true);
@@ -93,18 +116,26 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     await setTheme(theme === "dark" ? "light" : "dark");
   }, [setTheme, theme]);
 
+  const colors = useMemo(() => getThemeColors(theme), [theme]);
+  const themeVars = useMemo(() => vars(getThemeCssVars(colors)), [colors]);
+
   const value = useMemo(
     () => ({
       theme,
       isDark: theme === "dark",
       ready,
+      colors,
       setTheme,
       toggleTheme,
     }),
-    [theme, ready, setTheme, toggleTheme],
+    [theme, ready, colors, setTheme, toggleTheme],
   );
 
-  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
+  return (
+    <ThemeContext.Provider value={value}>
+      <View style={[{ flex: 1 }, themeVars]}>{children}</View>
+    </ThemeContext.Provider>
+  );
 }
 
 export function useTheme() {
@@ -113,4 +144,9 @@ export function useTheme() {
     throw new Error("useTheme must be used within ThemeProvider");
   }
   return ctx;
+}
+
+/** Convenience hook for semantic palette values. */
+export function useThemeColors(): ThemeColors {
+  return useTheme().colors;
 }

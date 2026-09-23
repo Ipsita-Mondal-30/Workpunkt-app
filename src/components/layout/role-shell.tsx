@@ -43,7 +43,7 @@ export function RoleShell({ role, title, children }: { role: AppRole; title: str
   const router = useRouter();
   const pathname = usePathname();
   const { profile, signOut } = useAuth();
-  const { isDark } = useTheme();
+  const { colors } = useTheme();
   const counsellorCtx = useOptionalCounsellorContext();
   const notifications = useApiQuery<AgentNotification[]>(queryKeys.agentNotifications(), "/api/agent/notifications", { enabled: role === "agent", cachePolicy: "live" });
   const unread = (notifications.data ?? []).filter((item) => !item.isRead).length;
@@ -51,7 +51,7 @@ export function RoleShell({ role, title, children }: { role: AppRole; title: str
   const insertAt = Math.max(0, base.findIndex((item) => item.label === "Training Hub"));
   const items = role === "counsellor" && counsellorCtx?.careerPathingActive
     ? [...base.slice(0, insertAt), ...COUNSELLOR_CP_NAV, ...base.slice(insertAt)] : base;
-  const ink = isDark ? "#e4e4e7" : "#514957";
+  const ink = colors.ink;
 
   async function logout() {
     setVisible(false);

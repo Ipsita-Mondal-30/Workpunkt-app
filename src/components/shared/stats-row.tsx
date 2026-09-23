@@ -1,6 +1,6 @@
 import { ScrollView, Text, View, useWindowDimensions } from "react-native";
 
-import { useTheme } from "@/lib/theme/theme-context";
+import { useThemeColors } from "@/lib/theme/theme-context";
 
 const COLOR_BAR = {
   purple: "#ad46ff",
@@ -17,10 +17,8 @@ export type StatCard = {
   color?: keyof typeof COLOR_BAR;
 };
 
-/** Horizontal padding used by PortalPage — keep peek math aligned. */
 const PAGE_GUTTER = 20;
 const CARD_GAP = 12;
-/** Always leave this much of the next card visible. */
 const NEXT_PEEK = 36;
 
 export function StatsRow({
@@ -28,15 +26,10 @@ export function StatsRow({
   scrollable = false,
 }: {
   stats: StatCard[];
-  /** Prefer horizontal peek rail on narrow admin/home layouts. */
   scrollable?: boolean;
 }) {
-  const { isDark } = useTheme();
+  const colors = useThemeColors();
   const { width: windowWidth } = useWindowDimensions();
-  const textColor = isDark ? "#ffffff" : "#0e0b11";
-  const mutedColor = isDark ? "#a1a1aa" : "#71717a";
-  const surfaceBg = isDark ? "#18151c" : "#ffffff";
-  const borderColor = isDark ? "#2e2a33" : "#e4e4e7";
 
   if (!stats.length) return null;
 
@@ -51,8 +44,8 @@ export function StatsRow({
           minWidth: width == null ? 140 : undefined,
           borderRadius: 16,
           borderWidth: 1,
-          borderColor,
-          backgroundColor: surfaceBg,
+          borderColor: colors.border,
+          backgroundColor: colors.surface,
           paddingHorizontal: 16,
           paddingVertical: 20,
         }}
@@ -66,14 +59,14 @@ export function StatsRow({
             backgroundColor: COLOR_BAR[stat.color ?? "purple"],
           }}
         />
-        <Text style={{ fontSize: 24, fontWeight: "700", color: textColor, letterSpacing: -0.3 }}>
+        <Text style={{ fontSize: 24, fontWeight: "700", color: colors.text, letterSpacing: -0.3 }}>
           {stat.value}
         </Text>
-        <Text style={{ marginTop: 4, fontSize: 12, fontWeight: "600", color: textColor }}>
+        <Text style={{ marginTop: 4, fontSize: 12, fontWeight: "600", color: colors.text }}>
           {stat.label}
         </Text>
         {stat.sub ? (
-          <Text style={{ marginTop: 4, fontSize: 12, color: mutedColor }}>{stat.sub}</Text>
+          <Text style={{ marginTop: 4, fontSize: 12, color: colors.muted }}>{stat.sub}</Text>
         ) : null}
       </View>
     );

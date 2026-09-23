@@ -6,19 +6,20 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { KlaraChatSheet } from "@/components/klara/klara-chat-sheet";
 import { KlaraAvatar } from "@/components/shared/klara-avatar";
 import type { AppRole } from "@/lib/auth/resolve-role";
+import { useThemeColors } from "@/lib/theme/theme-context";
 
 type KlaraFabProps = {
   role: AppRole;
 };
 
 /**
- * Floating Klara button — visual parity with website `ChatFab`
- * (60px white plate + full Klara avatar).
+ * Floating Klara button — dark-theme plate + full Klara avatar.
  */
 export function KlaraFab({ role }: KlaraFabProps) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const insets = useSafeAreaInsets();
+  const colors = useThemeColors();
 
   const onKlaraRoute = Boolean(pathname?.includes("/klara"));
   if (onKlaraRoute) {
@@ -52,14 +53,14 @@ export function KlaraFab({ role }: KlaraFabProps) {
               justifyContent: "center",
               overflow: "hidden",
               padding: 0,
-              backgroundColor: "#ffffff",
+              backgroundColor: colors.surface,
               shadowColor: "#000",
-              shadowOpacity: 0.28,
+              shadowOpacity: 0.4,
               shadowRadius: 15,
               shadowOffset: { width: 0, height: 10 },
               elevation: 10,
               borderWidth: 2,
-              borderColor: "rgba(255,255,255,0.92)",
+              borderColor: colors.border,
               opacity: pressed ? 0.92 : 1,
               transform: [{ scale: pressed ? 0.97 : 1 }],
             })}

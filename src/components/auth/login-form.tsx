@@ -18,6 +18,7 @@ import { GradientButton } from "@/components/shared/gradient-button";
 import { WorkpunktLogo } from "@/components/shared/workpunkt-logo";
 import { useAuth } from "@/lib/auth/auth-context";
 import { useTheme } from "@/lib/theme/theme-context";
+import type { ThemeColors } from "@/lib/theme/theme-colors";
 
 type SignupRole = {
   label: string;
@@ -44,11 +45,11 @@ function formatAuthError(message: string) {
 function OutlineLinkButton({
   label,
   onPress,
-  isDark,
+  colors,
 }: {
   label: string;
   onPress: () => void;
-  isDark: boolean;
+  colors: ThemeColors;
 }) {
   return (
     <Pressable
@@ -61,16 +62,8 @@ function OutlineLinkButton({
         justifyContent: "center",
         borderRadius: 12,
         borderWidth: 1,
-        borderColor: pressed
-          ? "rgba(186, 67, 237, 0.45)"
-          : isDark
-            ? "rgba(255,255,255,0.12)"
-            : "#e4e4e7",
-        backgroundColor: pressed
-          ? isDark
-            ? "rgba(255,255,255,0.04)"
-            : "rgba(14,11,17,0.03)"
-          : "transparent",
+        borderColor: pressed ? "rgba(186, 67, 237, 0.45)" : colors.border,
+        backgroundColor: pressed ? colors.inputBg : "transparent",
         paddingHorizontal: 14,
         paddingVertical: 12,
       })}
@@ -79,7 +72,7 @@ function OutlineLinkButton({
         style={{
           fontSize: 13,
           fontWeight: "600",
-          color: isDark ? "#ffffff" : "#0e0b11",
+          color: colors.text,
           textAlign: "center",
         }}
       >
@@ -91,7 +84,7 @@ function OutlineLinkButton({
 
 export function LoginForm() {
   const { signIn } = useAuth();
-  const { isDark } = useTheme();
+  const { isDark, colors } = useTheme();
   const router = useRouter();
   const scrollRef = useRef<ScrollView>(null);
   const passwordRef = useRef<TextInputType>(null);
@@ -99,15 +92,6 @@ export function LoginForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-
-  const placeholderColor = isDark ? "#a1a1aa" : "#71717a";
-  const pageBg = isDark ? "#09090b" : "#faf7fc";
-  const panelBg = isDark ? "rgba(9,9,11,0.92)" : "#ffffff";
-  const panelBorder = isDark ? "rgba(255,255,255,0.08)" : "rgba(228,228,231,0.95)";
-  const textColor = isDark ? "#ffffff" : "#0e0b11";
-  const mutedColor = isDark ? "#a1a1aa" : "#71717a";
-  const inputBg = isDark ? "rgba(255,255,255,0.04)" : "#ffffff";
-  const inputBorder = isDark ? "rgba(255,255,255,0.12)" : "#e4e4e7";
 
   async function onSubmit() {
     setError(null);
@@ -130,13 +114,9 @@ export function LoginForm() {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: pageBg }} edges={["top", "bottom", "left", "right"]}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }} edges={["top", "bottom", "left", "right"]}>
       <LinearGradient
-        colors={
-          isDark
-            ? ["#09090b", "#1a1020", "#09090b"]
-            : ["#faf7fc", "#fff5fb", "#f7f0ff"]
-        }
+        colors={colors.pageGradient}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={{ flex: 1 }}
@@ -168,8 +148,8 @@ export function LoginForm() {
               style={{
                 borderRadius: 24,
                 borderWidth: 1,
-                borderColor: panelBorder,
-                backgroundColor: panelBg,
+                borderColor: colors.panelBorder,
+                backgroundColor: colors.panelBg,
                 paddingHorizontal: 20,
                 paddingVertical: 24,
                 gap: 20,
@@ -185,13 +165,13 @@ export function LoginForm() {
                   style={{
                     fontSize: 32,
                     fontWeight: "700",
-                    color: textColor,
+                    color: colors.text,
                     letterSpacing: -0.4,
                   }}
                 >
                   Login
                 </Text>
-                <Text style={{ fontSize: 15, color: mutedColor, lineHeight: 22 }}>
+                <Text style={{ fontSize: 15, color: colors.muted, lineHeight: 22 }}>
                   Enter your account details
                 </Text>
               </View>
@@ -221,7 +201,7 @@ export function LoginForm() {
                       fontWeight: "700",
                       letterSpacing: 1.2,
                       textTransform: "uppercase",
-                      color: mutedColor,
+                      color: colors.muted,
                     }}
                   >
                     Email
@@ -232,7 +212,7 @@ export function LoginForm() {
                     autoCorrect={false}
                     keyboardType="email-address"
                     placeholder="email@example.com"
-                    placeholderTextColor={placeholderColor}
+                    placeholderTextColor={colors.placeholder}
                     value={email}
                     onChangeText={setEmail}
                     returnKeyType="next"
@@ -242,11 +222,11 @@ export function LoginForm() {
                       height: 56,
                       borderRadius: 16,
                       borderWidth: 1,
-                      borderColor: inputBorder,
-                      backgroundColor: inputBg,
+                      borderColor: colors.border,
+                      backgroundColor: colors.inputBg,
                       paddingHorizontal: 16,
                       fontSize: 16,
-                      color: textColor,
+                      color: colors.text,
                     }}
                   />
                 </View>
@@ -254,10 +234,9 @@ export function LoginForm() {
                 <PasswordField
                   ref={passwordRef}
                   label="Password"
-                  isDark={isDark}
                   autoComplete="password"
                   placeholder="Password"
-                  placeholderTextColor={placeholderColor}
+                  placeholderTextColor={colors.placeholder}
                   value={password}
                   onChangeText={setPassword}
                   returnKeyType="go"
@@ -272,11 +251,11 @@ export function LoginForm() {
                     height: 56,
                     borderRadius: 16,
                     borderWidth: 1,
-                    borderColor: inputBorder,
-                    backgroundColor: inputBg,
+                    borderColor: colors.border,
+                    backgroundColor: colors.inputBg,
                     paddingHorizontal: 16,
                     fontSize: 16,
-                    color: textColor,
+                    color: colors.text,
                   }}
                 />
               </View>
@@ -290,7 +269,7 @@ export function LoginForm() {
               <View
                 style={{
                   borderTopWidth: 1,
-                  borderTopColor: isDark ? "rgba(255,255,255,0.1)" : "#e4e4e7",
+                  borderTopColor: colors.border,
                   paddingTop: 16,
                   gap: 12,
                 }}
@@ -299,7 +278,7 @@ export function LoginForm() {
                   style={{
                     textAlign: "center",
                     fontSize: 13,
-                    color: mutedColor,
+                    color: colors.muted,
                   }}
                 >
                   Don't have an account?
@@ -316,7 +295,7 @@ export function LoginForm() {
                     <OutlineLinkButton
                       key={role.href}
                       label={role.label}
-                      isDark={isDark}
+                      colors={colors}
                       onPress={() => router.push(role.href)}
                     />
                   ))}
@@ -329,7 +308,7 @@ export function LoginForm() {
                 marginTop: 18,
                 textAlign: "center",
                 fontSize: 12,
-                color: mutedColor,
+                color: colors.muted,
                 lineHeight: 18,
               }}
             >

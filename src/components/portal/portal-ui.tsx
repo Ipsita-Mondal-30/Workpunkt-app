@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { KeyboardAvoidingView, Platform, Pressable, RefreshControl, ScrollView, Text, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import Svg, { Path } from "react-native-svg";
-import { useTheme } from "@/lib/theme/theme-context";
+import { useTheme, useThemeColors } from "@/lib/theme/theme-context";
 import { cn } from "@/lib/utils";
 
 const PATHS = {
@@ -33,21 +33,149 @@ export function PortalIcon({ name, size = 20, color = "#ba43ed" }: { name: Porta
 }
 
 export function PortalPage({ children, refreshing = false, onRefresh }: { children: ReactNode; refreshing?: boolean; onRefresh?: () => void }) {
-  const { isDark } = useTheme();
-  return <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined} keyboardVerticalOffset={90}><LinearGradient colors={isDark ? ["#15101d", "#09090b", "#120e14"] : ["#faf7ff", "#fffafb", "#ffffff"]} style={{ flex: 1 }}><ScrollView keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag" contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 20, paddingTop: 24, paddingBottom: 112 }} refreshControl={onRefresh ? <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#ba43ed" /> : undefined}><View style={{ width: "100%", maxWidth: 1080, alignSelf: "center" }}>{children}</View></ScrollView></LinearGradient></KeyboardAvoidingView>;
+  const colors = useThemeColors();
+  return <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined} keyboardVerticalOffset={90}><LinearGradient colors={colors.pageGradient} style={{ flex: 1 }}><ScrollView keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag" contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 20, paddingTop: 24, paddingBottom: 112 }} refreshControl={onRefresh ? <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.brandStart} /> : undefined}><View style={{ width: "100%", maxWidth: 1080, alignSelf: "center" }}>{children}</View></ScrollView></LinearGradient></KeyboardAvoidingView>;
 }
 
 export function PageHeading({ title, subtitle, eyebrow = "YOUR WORKPUNKT PORTAL", action }: { title: string; subtitle?: string; eyebrow?: string; action?: ReactNode }) {
-  return <View className="mb-6 gap-3"><Text className="text-[10px] font-bold uppercase tracking-[2px] text-brand-start">{eyebrow}</Text><View className="flex-row flex-wrap items-center justify-between gap-3"><Text accessibilityRole="header" className="shrink text-3xl font-bold tracking-tight text-text">{title}</Text>{action}</View>{subtitle ? <Text className="max-w-2xl text-sm leading-6 text-muted">{subtitle}</Text> : null}</View>;
+  const colors = useThemeColors();
+  return (
+    <View style={{ marginBottom: 24, gap: 12 }}>
+      <Text
+        style={{
+          fontSize: 10,
+          fontWeight: "700",
+          letterSpacing: 2,
+          textTransform: "uppercase",
+          color: colors.brandStart,
+        }}
+      >
+        {eyebrow}
+      </Text>
+      <View
+        style={{
+          flexDirection: "row",
+          flexWrap: "wrap",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 12,
+        }}
+      >
+        <Text
+          accessibilityRole="header"
+          style={{
+            flexShrink: 1,
+            fontSize: 30,
+            fontWeight: "700",
+            letterSpacing: -0.4,
+            color: colors.text,
+          }}
+        >
+          {title}
+        </Text>
+        {action}
+      </View>
+      {subtitle ? (
+        <Text style={{ maxWidth: 672, fontSize: 14, lineHeight: 24, color: colors.muted }}>
+          {subtitle}
+        </Text>
+      ) : null}
+    </View>
+  );
 }
 
 export function PortalCard({ title, caption, children, className }: { title?: string; caption?: string; children?: ReactNode; className?: string }) {
-  return <View className={cn("mb-4 rounded-3xl border border-border bg-surface p-5", className)}>{title ? <Text accessibilityRole="header" className="text-base font-bold text-text">{title}</Text> : null}{caption ? <Text className="mt-1 text-sm leading-5 text-muted">{caption}</Text> : null}{children}</View>;
+  const colors = useThemeColors();
+  return (
+    <View
+      className={cn("mb-4 rounded-3xl p-5", className)}
+      style={{ borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface }}
+    >
+      {title ? (
+        <Text accessibilityRole="header" style={{ fontSize: 16, fontWeight: "700", color: colors.text }}>
+          {title}
+        </Text>
+      ) : null}
+      {caption ? (
+        <Text style={{ marginTop: 4, fontSize: 14, lineHeight: 20, color: colors.muted }}>
+          {caption}
+        </Text>
+      ) : null}
+      {children}
+    </View>
+  );
 }
 
 export function PortalHero({ eyebrow, title, description, children }: { eyebrow: string; title: string; description: string; children?: ReactNode }) {
-  const { isDark } = useTheme();
-  return <View className="mb-6 overflow-hidden rounded-3xl border border-brand-start/20"><LinearGradient colors={isDark ? ["#291637", "#32172d", "#301d19"] : ["#f0e5ff", "#ffe8f3", "#fff0df"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={{ padding: 24 }}><View pointerEvents="none" accessible={false} style={{ position: "absolute", right: -45, top: -65, width: 190, height: 190, borderRadius: 95, borderWidth: 1, borderColor: "rgba(186,67,237,0.15)" }} /><Text className="text-[10px] font-bold uppercase tracking-[2px] text-brand-start">{eyebrow}</Text><Text className="mt-3 max-w-2xl text-3xl font-bold tracking-tight text-text">{title}</Text><Text className="mt-3 max-w-2xl text-sm leading-6 text-muted">{description}</Text>{children ? <View className="mt-5">{children}</View> : null}</LinearGradient></View>;
+  const colors = useThemeColors();
+  return (
+    <View
+      style={{
+        marginBottom: 24,
+        overflow: "hidden",
+        borderRadius: 24,
+        borderWidth: 1,
+        borderColor: "rgba(173, 70, 255, 0.2)",
+      }}
+    >
+      <LinearGradient
+        colors={colors.heroGradient}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={{ padding: 24 }}
+      >
+        <View
+          pointerEvents="none"
+          accessible={false}
+          style={{
+            position: "absolute",
+            right: -45,
+            top: -65,
+            width: 190,
+            height: 190,
+            borderRadius: 95,
+            borderWidth: 1,
+            borderColor: "rgba(186,67,237,0.15)",
+          }}
+        />
+        <Text
+          style={{
+            fontSize: 10,
+            fontWeight: "700",
+            letterSpacing: 2,
+            textTransform: "uppercase",
+            color: colors.brandStart,
+          }}
+        >
+          {eyebrow}
+        </Text>
+        <Text
+          style={{
+            marginTop: 12,
+            maxWidth: 672,
+            fontSize: 30,
+            fontWeight: "700",
+            letterSpacing: -0.4,
+            color: colors.text,
+          }}
+        >
+          {title}
+        </Text>
+        <Text
+          style={{
+            marginTop: 12,
+            maxWidth: 672,
+            fontSize: 14,
+            lineHeight: 24,
+            color: colors.muted,
+          }}
+        >
+          {description}
+        </Text>
+        {children ? <View style={{ marginTop: 20 }}>{children}</View> : null}
+      </LinearGradient>
+    </View>
+  );
 }
 
 export function ActionTile({
@@ -67,13 +195,11 @@ export function ActionTile({
   /** `rail` stacks content for peek carousels; `row` is the default list tile. */
   variant?: "row" | "rail";
 }) {
-  const { isDark } = useTheme();
+  const { isDark, colors } = useTheme();
   const isRail = variant === "rail";
-  const textColor = isDark ? "#ffffff" : "#0e0b11";
-  const mutedColor = isDark ? "#a1a1aa" : "#71717a";
-  const surfaceBg = isDark ? "#18151c" : "#ffffff";
-  const borderColor = isDark ? "#2e2a33" : "#e4e4e7";
-  const iconWell = isDark ? "rgba(186, 67, 237, 0.16)" : "rgba(173, 70, 255, 0.1)";
+  const iconWell = isDark
+    ? "rgba(186, 67, 237, 0.16)"
+    : "rgba(173, 70, 255, 0.1)";
 
   return (
     <Pressable
@@ -93,8 +219,8 @@ export function ActionTile({
         gap: isRail ? 0 : 16,
         borderRadius: 16,
         borderWidth: 1,
-        borderColor,
-        backgroundColor: surfaceBg,
+        borderColor: colors.border,
+        backgroundColor: colors.surface,
         padding: 16,
       })}
     >
@@ -116,7 +242,7 @@ export function ActionTile({
           style={{
             fontSize: 14,
             fontWeight: "700",
-            color: textColor,
+            color: colors.text,
             lineHeight: 20,
           }}
         >
@@ -128,7 +254,7 @@ export function ActionTile({
             marginTop: 4,
             fontSize: 12,
             lineHeight: 18,
-            color: mutedColor,
+            color: colors.muted,
           }}
         >
           {description}
@@ -152,9 +278,87 @@ export function ProgressBar({ value, label }: { value: number; label: string }) 
 }
 
 export function EmptyState({ title, description, icon = "file", action }: { title: string; description: string; icon?: PortalIconName; action?: ReactNode }) {
-  return <PortalCard><View className="items-center py-6"><View className="mb-4 h-14 w-14 items-center justify-center rounded-2xl bg-brand-start/10"><PortalIcon name={icon} size={26} /></View><Text className="text-center text-base font-bold text-text">{title}</Text><Text className="mt-2 max-w-md text-center text-sm leading-6 text-muted">{description}</Text>{action ? <View className="mt-5 w-full max-w-xs">{action}</View> : null}</View></PortalCard>;
+  const colors = useThemeColors();
+  return (
+    <PortalCard>
+      <View style={{ alignItems: "center", paddingVertical: 24 }}>
+        <View
+          style={{
+            marginBottom: 16,
+            height: 56,
+            width: 56,
+            alignItems: "center",
+            justifyContent: "center",
+            borderRadius: 16,
+            backgroundColor: "rgba(173, 70, 255, 0.1)",
+          }}
+        >
+          <PortalIcon name={icon} size={26} />
+        </View>
+        <Text style={{ textAlign: "center", fontSize: 16, fontWeight: "700", color: colors.text }}>
+          {title}
+        </Text>
+        <Text
+          style={{
+            marginTop: 8,
+            maxWidth: 448,
+            textAlign: "center",
+            fontSize: 14,
+            lineHeight: 24,
+            color: colors.muted,
+          }}
+        >
+          {description}
+        </Text>
+        {action ? <View style={{ marginTop: 20, width: "100%", maxWidth: 320 }}>{action}</View> : null}
+      </View>
+    </PortalCard>
+  );
 }
 
 export function LoadingCards() {
-  return <View accessibilityLabel="Loading content" accessibilityState={{ busy: true }} className="gap-4">{[0, 1, 2].map((index) => <View key={index} className="rounded-3xl border border-border bg-surface p-5"><View className="mb-4 h-3 w-24 rounded-full bg-brand-start/10" /><View className="mb-3 h-5 w-3/4 rounded-full bg-surface-end" /><View className="h-3 w-1/2 rounded-full bg-surface-end" /></View>)}</View>;
+  const colors = useThemeColors();
+  return (
+    <View accessibilityLabel="Loading content" accessibilityState={{ busy: true }} style={{ gap: 16 }}>
+      {[0, 1, 2].map((index) => (
+        <View
+          key={index}
+          style={{
+            borderRadius: 24,
+            borderWidth: 1,
+            borderColor: colors.border,
+            backgroundColor: colors.surface,
+            padding: 20,
+          }}
+        >
+          <View
+            style={{
+              marginBottom: 16,
+              height: 12,
+              width: 96,
+              borderRadius: 999,
+              backgroundColor: "rgba(173, 70, 255, 0.1)",
+            }}
+          />
+          <View
+            style={{
+              marginBottom: 12,
+              height: 20,
+              width: "75%",
+              borderRadius: 999,
+              backgroundColor: colors.surfaceEnd,
+            }}
+          />
+          <View
+            style={{
+              height: 12,
+              width: "50%",
+              borderRadius: 999,
+              backgroundColor: colors.surfaceEnd,
+            }}
+          />
+        </View>
+      ))}
+    </View>
+  );
 }

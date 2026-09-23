@@ -4,6 +4,7 @@ import * as Clipboard from "expo-clipboard";
 
 import { GradientButton } from "@/components/shared/gradient-button";
 import { startMobileCheckout } from "@/lib/stripe/mobile-checkout";
+import { useThemeColors } from "@/lib/theme/theme-context";
 import { cn } from "@/lib/utils";
 
 export type KlaraMatchProgram = {
@@ -43,6 +44,7 @@ export function KlaraMatchResults({
   onBookCounselling,
   className,
 }: KlaraMatchResultsProps) {
+  const colors = useThemeColors();
   const [copied, setCopied] = useState(false);
   const [reportBusy, setReportBusy] = useState(false);
   const [reportError, setReportError] = useState<string | null>(null);
@@ -75,7 +77,10 @@ export function KlaraMatchResults({
   }
 
   return (
-    <View className={cn("mt-2 rounded-2xl border border-border bg-surface px-3 py-3", className)}>
+    <View
+      className={cn("mt-2 rounded-2xl border px-3 py-3", className)}
+      style={{ backgroundColor: colors.surface, borderColor: colors.border }}
+    >
       <View className="mb-2 flex-row items-center justify-between gap-2">
         <Text className="flex-1 text-sm font-bold text-text">
           {programs.length === 1
@@ -83,12 +88,20 @@ export function KlaraMatchResults({
             : `Your ${programs.length} university matches`}
         </Text>
         <View className="flex-row gap-2">
-          <Pressable onPress={() => void handleCopy()} className="rounded-lg bg-surface-end px-2 py-1">
+          <Pressable
+            onPress={() => void handleCopy()}
+            className="rounded-lg px-2 py-1"
+            style={{ backgroundColor: colors.surfaceEnd }}
+          >
             <Text className="text-[11px] font-semibold text-brand-mid">
               {copied ? "Copied" : "Copy"}
             </Text>
           </Pressable>
-          <Pressable onPress={() => void handleShare()} className="rounded-lg bg-surface-end px-2 py-1">
+          <Pressable
+            onPress={() => void handleShare()}
+            className="rounded-lg px-2 py-1"
+            style={{ backgroundColor: colors.surfaceEnd }}
+          >
             <Text className="text-[11px] font-semibold text-brand-mid">Share</Text>
           </Pressable>
         </View>
@@ -105,7 +118,8 @@ export function KlaraMatchResults({
         {programs.map((program, index) => (
           <View
             key={program.programRecordId ?? `${program.universityName}-${index}`}
-            className="rounded-xl border border-border bg-bg px-3 py-2.5"
+            className="rounded-xl border px-3 py-2.5"
+            style={{ backgroundColor: colors.surfaceEnd, borderColor: colors.border }}
           >
             <Text className="text-sm font-semibold text-text">{program.universityName}</Text>
             <Text className="mt-0.5 text-xs font-medium text-brand-mid">{program.programName}</Text>

@@ -18,7 +18,7 @@ import { authFetch } from "@/lib/api/auth-fetch";
 import { QUALIFIER_QUESTIONS } from "@/lib/klara/qualifier-questions";
 import { queryKeys } from "@/lib/query/keys";
 import { fetchApiJson, postApiJson } from "@/lib/query/use-api";
-import { useTheme } from "@/lib/theme/theme-context";
+import { useThemeColors } from "@/lib/theme/theme-context";
 
 type ChatMessage = {
   id: string;
@@ -85,8 +85,7 @@ export function KlaraMatchingScreen({
   onClearStudent,
   onPickStudent,
 }: KlaraMatchingScreenProps) {
-  const { isDark } = useTheme();
-  const placeholderColor = isDark ? "#a1a1aa" : "#71717a";
+  const colors = useThemeColors();
   const queryClient = useQueryClient();
   const hasTarget = Boolean(studentEmail || studentProfileId);
   const blocked = requireStudentTarget && !hasTarget;
@@ -425,9 +424,14 @@ export function KlaraMatchingScreen({
               value={input}
               onChangeText={setInput}
               placeholder="Ask Klara…"
-              placeholderTextColor={placeholderColor}
+              placeholderTextColor={colors.placeholder}
               multiline
-              className="max-h-28 flex-1 rounded-xl border border-border bg-surface px-3 py-2 text-sm text-text"
+              className="max-h-28 flex-1 rounded-xl border border-border px-3 py-2 text-sm text-text"
+              style={{
+                backgroundColor: colors.inputBg,
+                borderColor: colors.border,
+                color: colors.text,
+              }}
             />
             <Pressable
               onPress={() => void sendChat()}
@@ -453,7 +457,7 @@ export function KlaraMatchingScreen({
         </View>
       ) : (
         <ScrollView className="flex-1" contentContainerClassName="px-4 py-4 pb-10 gap-4">
-          {statusLoading ? <ActivityIndicator color="#f6339a" /> : null}
+          {statusLoading ? <ActivityIndicator color={colors.brandMid} /> : null}
           {statusError ? (
             <Text className="text-sm text-error">{statusError}</Text>
           ) : null}

@@ -13,7 +13,7 @@ import { StatsRow, type StatCard } from "@/components/shared/stats-row";
 import { useAuth } from "@/lib/auth/auth-context";
 import { queryKeys } from "@/lib/query/keys";
 import { useApiQuery } from "@/lib/query/use-api";
-import { useTheme } from "@/lib/theme/theme-context";
+import { useThemeColors } from "@/lib/theme/theme-context";
 
 const PAGE_GUTTER = 20;
 const CARD_GAP = 12;
@@ -129,7 +129,7 @@ function buildStats(data: CommandCentreData): StatCard[] {
 
 export default function AdminHome() {
   const { profile } = useAuth();
-  const { isDark } = useTheme();
+  const colors = useThemeColors();
   const router = useRouter();
   const { width: windowWidth } = useWindowDimensions();
   const query = useApiQuery<CommandCentreData>(
@@ -140,10 +140,10 @@ export default function AdminHome() {
 
   const cardWidth = Math.max(240, windowWidth - PAGE_GUTTER - NEXT_PEEK);
   const data = query.data;
-  const textColor = isDark ? "#ffffff" : "#0e0b11";
-  const mutedColor = isDark ? "#a1a1aa" : "#71717a";
-  const surfaceBg = isDark ? "#18151c" : "#ffffff";
-  const borderColor = isDark ? "#2e2a33" : "#e4e4e7";
+  const textColor = colors.text;
+  const mutedColor = colors.muted;
+  const surfaceBg = colors.surface;
+  const borderColor = colors.border;
 
   return (
     <PortalPage

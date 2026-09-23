@@ -10,6 +10,8 @@ import {
 } from "react-native";
 import Svg, { Path } from "react-native-svg";
 
+import { useThemeColors } from "@/lib/theme/theme-context";
+
 type PasswordFieldProps = Omit<TextInputProps, "secureTextEntry"> & {
   label?: string;
   isDark?: boolean;
@@ -54,11 +56,12 @@ function EyeIcon({ open, color }: { open: boolean; color: string }) {
 
 export const PasswordField = forwardRef<TextInput, PasswordFieldProps>(
   function PasswordField(
-    { label, isDark = false, style, inputStyle, className, ...props },
+    { label, isDark: _isDark = false, style, inputStyle, className, ...props },
     ref,
   ) {
     const [showPassword, setShowPassword] = useState(false);
-    const mutedColor = isDark ? "#a1a1aa" : "#71717a";
+    const colors = useThemeColors();
+    const mutedColor = colors.muted;
 
     return (
       <View style={{ gap: 6 }}>
