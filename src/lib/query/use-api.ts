@@ -11,6 +11,7 @@ import {
   cacheOptions,
   type CachePolicy,
 } from "@/lib/query/cache-policy";
+import { invalidateQueryKeys } from "@/lib/query/invalidate";
 
 type ApiEnvelope<T> = {
   data?: T;
@@ -94,11 +95,7 @@ export function useApiMutation<TBody, TResult = unknown>(
     mutationFn: (body: TBody) => postApiJson<TResult>(path, body),
     onSuccess: async () => {
       if (!invalidateKeys?.length) return;
-      await Promise.all(
-        invalidateKeys.map((key) =>
-          client.invalidateQueries({ queryKey: key }),
-        ),
-      );
+      await invalidateQueryKeys(client, invalidateKeys);
     },
   });
 }

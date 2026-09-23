@@ -1,6 +1,7 @@
-import { Alert, Linking, Pressable, Text, TextInput, View } from "react-native";
+import { Linking, Pressable, Text, TextInput, View } from "react-native";
 import { useState } from "react";
 import * as WebBrowser from "expo-web-browser";
+import { appAlert } from "@/lib/ui/app-alert";
 
 import { DetailSheet } from "@/components/shared/detail-sheet";
 import {
@@ -11,6 +12,7 @@ import { ResourceScreen } from "@/components/shared/resource-screen";
 import { StatsRow } from "@/components/shared/stats-row";
 import { queryKeys } from "@/lib/query/keys";
 import { useApiMutation } from "@/lib/query/use-api";
+import { useThemeColors } from "@/lib/theme/theme-context";
 
 const STATUS_OPTIONS = [
   "Submitted",
@@ -66,6 +68,7 @@ function escapeCsv(value: string) {
 }
 
 export default function AdminApplicationsOpsScreen() {
+  const colors = useThemeColors();
   const [selected, setSelected] = useState<ActiveApplication | null>(null);
   const [status, setStatus] = useState("");
   const [notes, setNotes] = useState("");
@@ -80,6 +83,7 @@ export default function AdminApplicationsOpsScreen() {
     { ok: boolean; error?: string }
   >("/api/admin/applications-ops/status", [
     queryKeys.adminApplicationsOps(),
+    queryKeys.adminStudentPipeline(),
     queryKeys.adminCommandCentre(),
   ]);
 
@@ -205,7 +209,7 @@ export default function AdminApplicationsOpsScreen() {
                 value={filter}
                 onChangeText={setFilter}
                 placeholder="Filter by student, university, status…"
-                placeholderTextColor="#71717a"
+                placeholderTextColor={colors.placeholder}
                 className="mb-3 rounded-xl border border-border bg-surface px-3 py-3 text-sm text-text"
               />
 
@@ -290,7 +294,7 @@ export default function AdminApplicationsOpsScreen() {
                 value={notes}
                 onChangeText={setNotes}
                 placeholder="Pending documents…"
-                placeholderTextColor="#71717a"
+                placeholderTextColor={colors.placeholder}
                 multiline
                 className="min-h-[80px] rounded-xl border border-border bg-surface px-3 py-3 text-sm text-text"
               />
@@ -308,9 +312,9 @@ export default function AdminApplicationsOpsScreen() {
                   {
                     onSuccess: () => {
                       setSelected(null);
-                      Alert.alert("Saved", "Application status updated.");
+                      appAlert("Saved", "Application status updated.");
                     },
-                    onError: (error) => Alert.alert("Error", error.message),
+                    onError: (error) => appAlert("Error", error.message),
                   },
                 )
               }

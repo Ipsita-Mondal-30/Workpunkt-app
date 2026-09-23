@@ -29,8 +29,9 @@ export function cacheOptions(policy: CachePolicy = "standard"): CacheQueryOption
   return {
     staleTime: CACHE_MS[policy],
     gcTime: CACHE_MS.gc,
-    // Only refetch when data is actually stale (RQ default), not on every focus.
+    // Show cached data immediately; only refetch when stale.
     refetchOnMount: true,
+    // Live policy refreshes on focus; heavy/standard rely on invalidation + pull-to-refresh.
     refetchOnWindowFocus: policy === "live",
     refetchOnReconnect: true,
     retry: 1,
