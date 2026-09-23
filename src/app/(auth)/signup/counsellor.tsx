@@ -10,12 +10,11 @@ import { GradientButton } from "@/components/shared/gradient-button";
 import { publicPostJson } from "@/lib/api/public-fetch";
 import { isValidPhoneNumber } from "@/lib/phone/phone-number";
 import { normalizeLeadEmail } from "@/lib/signup/email";
-import { useTheme } from "@/lib/theme/theme-context";
+import { useThemeColors } from "@/lib/theme/theme-context";
 
 export default function CounsellorSignupScreen() {
   const router = useRouter();
-  const { isDark } = useTheme();
-  const placeholderColor = isDark ? "#a1a1aa" : "#71717a";
+  const colors = useThemeColors();
   const [fullName, setFullName] = useState("");
   const [workEmail, setWorkEmail] = useState("");
   const [schoolName, setSchoolName] = useState("");
@@ -90,7 +89,7 @@ export default function CounsellorSignupScreen() {
       <SignupField label="Full name">
         <TextInput
           placeholder="Priya Sharma"
-          placeholderTextColor={placeholderColor}
+          placeholderTextColor={colors.placeholder}
           value={fullName}
           onChangeText={setFullName}
           className={signupInputClass()}
@@ -103,7 +102,7 @@ export default function CounsellorSignupScreen() {
           autoComplete="email"
           keyboardType="email-address"
           placeholder="counsellor@school.edu"
-          placeholderTextColor={placeholderColor}
+          placeholderTextColor={colors.placeholder}
           value={workEmail}
           onChangeText={setWorkEmail}
           className={signupInputClass()}
@@ -113,7 +112,7 @@ export default function CounsellorSignupScreen() {
       <SignupField label="School / university name">
         <TextInput
           placeholder="Delhi Public School"
-          placeholderTextColor={placeholderColor}
+          placeholderTextColor={colors.placeholder}
           value={schoolName}
           onChangeText={setSchoolName}
           className={signupInputClass()}
@@ -123,7 +122,7 @@ export default function CounsellorSignupScreen() {
       <SignupField label="Role / designation">
         <TextInput
           placeholder="College Counselor"
-          placeholderTextColor={placeholderColor}
+          placeholderTextColor={colors.placeholder}
           value={roleDesignation}
           onChangeText={setRole}
           className={signupInputClass()}
@@ -133,7 +132,7 @@ export default function CounsellorSignupScreen() {
       <SignupField label="City & country">
         <TextInput
           placeholder="Mumbai, India"
-          placeholderTextColor={placeholderColor}
+          placeholderTextColor={colors.placeholder}
           value={cityCountry}
           onChangeText={setCity}
           className={signupInputClass()}

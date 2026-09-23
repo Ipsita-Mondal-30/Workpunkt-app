@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Alert, Text, TextInput, View } from "react-native";
+import { Text, TextInput, View } from "react-native";
 import { useQuery } from "@tanstack/react-query";
 
 import { CounsellorScroll, SectionCard } from "@/components/counsellor/counsellor-scroll";
@@ -7,6 +7,7 @@ import { CounsellorScreenShell } from "@/components/counsellor/counsellor-screen
 import { GradientButton } from "@/components/shared/gradient-button";
 import { authFetch } from "@/lib/api/auth-fetch";
 import { useCounsellorContext } from "@/lib/counsellor/use-counsellor-context";
+import { appAlert } from "@/lib/ui/app-alert";
 
 export default function SupportScreen() {
   const { refreshing, refresh } = useCounsellorContext();
@@ -56,7 +57,7 @@ export default function SupportScreen() {
       setMessage("");
       await inboxQuery.refetch();
     } catch (error) {
-      Alert.alert(
+      appAlert(
         "Error",
         error instanceof Error ? error.message : "Could not send message.",
       );

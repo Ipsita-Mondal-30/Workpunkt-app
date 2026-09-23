@@ -1,5 +1,6 @@
-import { Alert, Pressable, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { useState } from "react";
+import { appAlert } from "@/lib/ui/app-alert";
 
 import { DetailSheet } from "@/components/shared/detail-sheet";
 import {
@@ -230,8 +231,8 @@ export default function AdminAgentsPartnersScreen() {
                   remind.mutate(
                     { all: true },
                     {
-                      onSuccess: () => Alert.alert("Sent", "Training reminders sent."),
-                      onError: (error) => Alert.alert("Error", error.message),
+                      onSuccess: () => appAlert("Sent", "Training reminders sent."),
+                      onError: (error) => appAlert("Error", error.message),
                     },
                   )
                 }
@@ -313,9 +314,9 @@ export default function AdminAgentsPartnersScreen() {
                   {
                     onSuccess: () => {
                       setSelected(null);
-                      Alert.alert("Approved", "Agent approved.");
+                      appAlert("Approved", "Agent approved.");
                     },
-                    onError: (error) => Alert.alert("Error", error.message),
+                    onError: (error) => appAlert("Error", error.message),
                   },
                 )
               }
@@ -330,9 +331,9 @@ export default function AdminAgentsPartnersScreen() {
                   {
                     onSuccess: () => {
                       setSelected(null);
-                      Alert.alert("Declined", "Application declined.");
+                      appAlert("Declined", "Application declined.");
                     },
-                    onError: (error) => Alert.alert("Error", error.message),
+                    onError: (error) => appAlert("Error", error.message),
                   },
                 )
               }
@@ -345,8 +346,8 @@ export default function AdminAgentsPartnersScreen() {
                 resend.mutate(
                   { airtableRecordId: selected.row.id, kind: "agent" },
                   {
-                    onSuccess: () => Alert.alert("Sent", "Invite resent."),
-                    onError: (error) => Alert.alert("Error", error.message),
+                    onSuccess: () => appAlert("Sent", "Invite resent."),
+                    onError: (error) => appAlert("Error", error.message),
                   },
                 )
               }
@@ -373,8 +374,8 @@ export default function AdminAgentsPartnersScreen() {
                       airtablePartnerId: selected.row.id,
                     },
                     {
-                      onSuccess: () => Alert.alert("Sent", "Training reminder sent."),
-                      onError: (error) => Alert.alert("Error", error.message),
+                      onSuccess: () => appAlert("Sent", "Training reminder sent."),
+                      onError: (error) => appAlert("Error", error.message),
                     },
                   )
                 }
@@ -390,8 +391,8 @@ export default function AdminAgentsPartnersScreen() {
                 startChat.mutate(
                   { agentName: selected.row.name, agentEmail: selected.row.email },
                   {
-                    onSuccess: () => Alert.alert("Started", "Help chat thread opened."),
-                    onError: (error) => Alert.alert("Error", error.message),
+                    onSuccess: () => appAlert("Started", "Help chat thread opened."),
+                    onError: (error) => appAlert("Error", error.message),
                   },
                 )
               }
@@ -418,9 +419,9 @@ export default function AdminAgentsPartnersScreen() {
                       {
                         onSuccess: () => {
                           setSelected(null);
-                          Alert.alert("Approved", "Counsellor approved.");
+                          appAlert("Approved", "Counsellor approved.");
                         },
-                        onError: (error) => Alert.alert("Error", error.message),
+                        onError: (error) => appAlert("Error", error.message),
                       },
                     )
                   }
@@ -434,7 +435,7 @@ export default function AdminAgentsPartnersScreen() {
                       { airtableRecordId: selected.row.id, kind: "counsellor" },
                       {
                         onSuccess: () => setSelected(null),
-                        onError: (error) => Alert.alert("Error", error.message),
+                        onError: (error) => appAlert("Error", error.message),
                       },
                     )
                   }
@@ -452,8 +453,8 @@ export default function AdminAgentsPartnersScreen() {
                     payStatus: selected.row.payStatus === "Paid" ? "Unpaid" : "Paid",
                   },
                   {
-                    onSuccess: () => Alert.alert("Updated", "Pay status updated."),
-                    onError: (error) => Alert.alert("Error", error.message),
+                    onSuccess: () => appAlert("Updated", "Pay status updated."),
+                    onError: (error) => appAlert("Error", error.message),
                   },
                 )
               }

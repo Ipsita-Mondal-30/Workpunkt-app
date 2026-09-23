@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Alert, Text, TextInput } from "react-native";
+import { Text, TextInput } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 
 import { CounsellorScroll, SectionCard } from "@/components/counsellor/counsellor-scroll";
@@ -7,6 +7,7 @@ import { CounsellorScreenShell } from "@/components/counsellor/counsellor-screen
 import { GradientButton } from "@/components/shared/gradient-button";
 import { authFetch } from "@/lib/api/auth-fetch";
 import { useCounsellorContext } from "@/lib/counsellor/use-counsellor-context";
+import { appAlert } from "@/lib/ui/app-alert";
 
 export default function RoadmapDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -18,7 +19,7 @@ export default function RoadmapDetailScreen() {
 
   async function saveRoadmap() {
     if (!roadmap?.roadmap_json) {
-      Alert.alert("Unavailable", "This roadmap has no editable content yet.");
+      appAlert("Unavailable", "This roadmap has no editable content yet.");
       return;
     }
 
@@ -40,9 +41,9 @@ export default function RoadmapDetailScreen() {
         throw new Error(json.error ?? "Could not save roadmap.");
       }
       await refresh();
-      Alert.alert("Saved", "Roadmap updated.");
+      appAlert("Saved", "Roadmap updated.");
     } catch (error) {
-      Alert.alert(
+      appAlert(
         "Error",
         error instanceof Error ? error.message : "Could not save roadmap.",
       );

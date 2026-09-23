@@ -1,10 +1,11 @@
-import { Alert, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 
 import { postApiJson } from "@/lib/query/use-api";
 import { PageHeading, PortalHero, PortalIcon, PortalPage } from "@/components/portal/portal-ui";
 import { GradientButton } from "@/components/shared/gradient-button";
+import { appAlert } from "@/lib/ui/app-alert";
 
 const SERVICES = [
   { id: "visa", title: "Green Light — APS + Student Visa Support", description: "Every document APS and the visa office need, prepared right the first time.", price: "€299", note: "One-time" },
@@ -26,11 +27,11 @@ export default function StudentServicesScreen() {
         kind: "student_help",
         message: `I am interested in ${service.title}. Listed price: ${service.price} (${service.note}). Please help me with the next step.`,
       });
-      Alert.alert("Request sent", "A counsellor will follow up in your Help chat.", [
+      appAlert("Request sent", "A counsellor will follow up in your Help chat.", [
         { text: "Open chat", onPress: () => router.push("/(student)/support") },
       ]);
     } catch (error) {
-      Alert.alert("Could not send request", error instanceof Error ? error.message : "Please try again.");
+      appAlert("Could not send request", error instanceof Error ? error.message : "Please try again.");
     } finally {
       setPending(null);
     }

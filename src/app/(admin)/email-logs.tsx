@@ -1,5 +1,7 @@
-import { Alert, Pressable, Text, TextInput, View } from "react-native";
+import { Pressable, Text, TextInput, View } from "react-native";
 import { useState } from "react";
+import { useThemeColors } from "@/lib/theme/theme-context";
+import { appAlert } from "@/lib/ui/app-alert";
 
 import { DetailSheet } from "@/components/shared/detail-sheet";
 import {
@@ -26,6 +28,7 @@ type EmailLogsData = {
 };
 
 export default function AdminEmailLogsScreen() {
+  const colors = useThemeColors();
   const [selected, setSelected] = useState<EmailLogListItem | null>(null);
   const [newEmail, setNewEmail] = useState("");
   const [lookupInfo, setLookupInfo] = useState<string | null>(null);
@@ -157,7 +160,7 @@ export default function AdminEmailLogsScreen() {
                       );
                       if (result.currentEmail) setNewEmail(result.currentEmail);
                     },
-                    onError: (error) => Alert.alert("Error", error.message),
+                    onError: (error) => appAlert("Error", error.message),
                   },
                 )
               }
@@ -173,7 +176,7 @@ export default function AdminEmailLogsScreen() {
               value={newEmail}
               onChangeText={setNewEmail}
               placeholder="Corrected email"
-              placeholderTextColor="#71717a"
+              placeholderTextColor={colors.placeholder}
               autoCapitalize="none"
               keyboardType="email-address"
               className="rounded-xl border border-border bg-surface px-3 py-3 text-sm text-text"
@@ -186,8 +189,8 @@ export default function AdminEmailLogsScreen() {
                   { oldEmail: selected.to[0] ?? "", newEmail },
                   {
                     onSuccess: (result) =>
-                      Alert.alert("Updated", result.message ?? "Email updated."),
-                    onError: (error) => Alert.alert("Error", error.message),
+                      appAlert("Updated", result.message ?? "Email updated."),
+                    onError: (error) => appAlert("Error", error.message),
                   },
                 )
               }
@@ -204,8 +207,8 @@ export default function AdminEmailLogsScreen() {
                   { emailId: selected.id, toEmail: newEmail },
                   {
                     onSuccess: (result) =>
-                      Alert.alert("Resent", result.message ?? "Email resent."),
-                    onError: (error) => Alert.alert("Error", error.message),
+                      appAlert("Resent", result.message ?? "Email resent."),
+                    onError: (error) => appAlert("Error", error.message),
                   },
                 )
               }

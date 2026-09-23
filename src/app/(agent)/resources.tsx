@@ -4,6 +4,7 @@ import { Pressable, Text, TextInput, View } from "react-native";
 import { ResourceScreen } from "@/components/shared/resource-screen";
 import { openExternalUrl } from "@/lib/open-external-url";
 import { queryKeys } from "@/lib/query/keys";
+import { useThemeColors } from "@/lib/theme/theme-context";
 
 type AgentResource = {
   id: string;
@@ -27,6 +28,7 @@ function resourceLink(resource: AgentResource) {
 }
 
 export default function AgentResourcesScreen() {
+  const colors = useThemeColors();
   const [search, setSearch] = useState("");
 
   return (
@@ -41,7 +43,7 @@ export default function AgentResourcesScreen() {
         const resources = data.resources.filter((resource) => !needle || `${resource.title} ${resource.description} ${resource.category} ${resource.meta}`.toLowerCase().includes(needle));
         return (
         <View>
-          <TextInput value={search} onChangeText={setSearch} placeholder="Search resources…" placeholderTextColor="#71717a" className="mb-4 rounded-xl border border-border bg-surface px-4 py-3 text-sm text-text" />
+          <TextInput value={search} onChangeText={setSearch} placeholder="Search resources…" placeholderTextColor={colors.placeholder} className="mb-4 rounded-xl border border-border bg-surface px-4 py-3 text-sm text-text" />
           <View className="gap-2">
           {resources.length === 0 ? (
             <View className="rounded-2xl border border-border bg-surface px-4 py-6">

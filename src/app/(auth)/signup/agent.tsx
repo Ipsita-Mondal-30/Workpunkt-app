@@ -24,7 +24,7 @@ import {
   PARTNER_TEAM_SIZE_OPTIONS,
   PARTNER_TYPE_OPTIONS,
 } from "@/lib/signup/form-options";
-import { useTheme } from "@/lib/theme/theme-context";
+import { useThemeColors } from "@/lib/theme/theme-context";
 import { cn } from "@/lib/utils";
 
 type Step1 = {
@@ -54,8 +54,7 @@ type AgentApplyResult = {
 
 export default function AgentSignupScreen() {
   const router = useRouter();
-  const { isDark } = useTheme();
-  const placeholderColor = isDark ? "#a1a1aa" : "#71717a";
+  const colors = useThemeColors();
   const copy = partnerSignUpCopy;
   const [step, setStep] = useState<1 | 2>(1);
   const [step1, setStep1] = useState<Step1>({
@@ -213,7 +212,7 @@ export default function AgentSignupScreen() {
             <TextInput
               autoComplete="name"
               placeholder={copy.fields.fullName.placeholder}
-              placeholderTextColor={placeholderColor}
+              placeholderTextColor={colors.placeholder}
               value={step1.fullName}
               onChangeText={(fullName: string) => patchStep1({ fullName })}
               className={signupInputClass(Boolean(fieldErrors.fullName))}
@@ -222,7 +221,7 @@ export default function AgentSignupScreen() {
           <SignupField label={copy.fields.designation.label} error={fieldErrors.designation}>
             <TextInput
               placeholder={copy.fields.designation.placeholder}
-              placeholderTextColor={placeholderColor}
+              placeholderTextColor={colors.placeholder}
               value={step1.designation}
               onChangeText={(designation: string) => patchStep1({ designation })}
               className={signupInputClass(Boolean(fieldErrors.designation))}
@@ -234,7 +233,7 @@ export default function AgentSignupScreen() {
               autoComplete="email"
               keyboardType="email-address"
               placeholder={copy.fields.workEmail.placeholder}
-              placeholderTextColor={placeholderColor}
+              placeholderTextColor={colors.placeholder}
               value={step1.workEmail}
               onChangeText={(workEmail: string) => patchStep1({ workEmail })}
               className={signupInputClass(Boolean(fieldErrors.workEmail))}
@@ -251,7 +250,7 @@ export default function AgentSignupScreen() {
           <SignupField label={copy.fields.organisation.label} error={fieldErrors.organisation}>
             <TextInput
               placeholder={copy.fields.organisation.placeholder}
-              placeholderTextColor={placeholderColor}
+              placeholderTextColor={colors.placeholder}
               value={step1.organisation}
               onChangeText={(organisation: string) => patchStep1({ organisation })}
               className={signupInputClass(Boolean(fieldErrors.organisation))}
@@ -260,7 +259,7 @@ export default function AgentSignupScreen() {
           <SignupField label={copy.fields.cityCountry.label} error={fieldErrors.cityCountry}>
             <TextInput
               placeholder={copy.fields.cityCountry.placeholder}
-              placeholderTextColor={placeholderColor}
+              placeholderTextColor={colors.placeholder}
               value={step1.cityCountry}
               onChangeText={(cityCountry: string) => patchStep1({ cityCountry })}
               className={signupInputClass(Boolean(fieldErrors.cityCountry))}
@@ -375,7 +374,7 @@ export default function AgentSignupScreen() {
           <SignupField label={copy.fields.why.label} error={fieldErrors.why}>
             <TextInput
               placeholder={copy.fields.why.placeholder}
-              placeholderTextColor={placeholderColor}
+              placeholderTextColor={colors.placeholder}
               multiline
               value={whyWorkpunkt}
               onChangeText={(value: string) => {

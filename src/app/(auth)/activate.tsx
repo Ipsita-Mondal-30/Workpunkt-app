@@ -7,13 +7,12 @@ import { SignupShell } from "@/components/auth/signup-shell";
 import { GradientButton } from "@/components/shared/gradient-button";
 import { publicPostJson } from "@/lib/api/public-fetch";
 import { useAuth } from "@/lib/auth/auth-context";
-import { useTheme } from "@/lib/theme/theme-context";
+import { useThemeColors } from "@/lib/theme/theme-context";
 
 export default function PartnerActivateScreen() {
   const router = useRouter();
   const { signIn } = useAuth();
-  const { isDark } = useTheme();
-  const placeholderColor = isDark ? "#a1a1aa" : "#71717a";
+  const colors = useThemeColors();
   const params = useLocalSearchParams<{ token?: string }>();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -64,17 +63,15 @@ export default function PartnerActivateScreen() {
       ) : null}
 
       <PasswordField
-        isDark={isDark}
         placeholder="Password"
-        placeholderTextColor={placeholderColor}
+        placeholderTextColor={colors.placeholder}
         value={password}
         onChangeText={setPassword}
         className="mb-3 rounded-2xl border border-border bg-surface px-4 py-4 text-base text-text"
       />
       <PasswordField
-        isDark={isDark}
         placeholder="Confirm password"
-        placeholderTextColor={placeholderColor}
+        placeholderTextColor={colors.placeholder}
         value={confirmPassword}
         onChangeText={setConfirmPassword}
         className="mb-6 rounded-2xl border border-border bg-surface px-4 py-4 text-base text-text"

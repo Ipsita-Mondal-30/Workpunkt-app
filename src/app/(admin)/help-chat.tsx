@@ -1,4 +1,4 @@
-import { Alert, Pressable, Text, TextInput, View } from "react-native";
+import { Pressable, Text, TextInput, View } from "react-native";
 import { useState } from "react";
 
 import { DetailSheet } from "@/components/shared/detail-sheet";
@@ -6,6 +6,8 @@ import { ResourceScreen } from "@/components/shared/resource-screen";
 import { StatsRow } from "@/components/shared/stats-row";
 import { queryKeys } from "@/lib/query/keys";
 import { useApiMutation } from "@/lib/query/use-api";
+import { useThemeColors } from "@/lib/theme/theme-context";
+import { appAlert } from "@/lib/ui/app-alert";
 
 type HelpChatMessage = {
   id: string;
@@ -39,6 +41,7 @@ type HelpChatData = {
 };
 
 export default function AdminHelpChatScreen() {
+  const colors = useThemeColors();
   const [selected, setSelected] = useState<HelpChatThread | null>(null);
   const [reply, setReply] = useState("");
 
@@ -76,7 +79,7 @@ export default function AdminHelpChatScreen() {
             onPress={() =>
               readMutation.mutate(
                 { all: true },
-                { onError: (error) => Alert.alert("Error", error.message) },
+                { onError: (error) => appAlert("Error", error.message) },
               )
             }
             className="rounded-xl bg-surface-end px-3 py-2"
@@ -163,7 +166,7 @@ export default function AdminHelpChatScreen() {
               value={reply}
               onChangeText={setReply}
               placeholder="Write a reply…"
-              placeholderTextColor="#71717a"
+              placeholderTextColor={colors.placeholder}
               multiline
               className="min-h-[80px] rounded-xl border border-border bg-surface px-3 py-3 text-sm text-text"
             />
@@ -176,10 +179,10 @@ export default function AdminHelpChatScreen() {
                   {
                     onSuccess: () => {
                       setReply("");
-                      Alert.alert("Sent", "Reply sent.");
+                      appAlert("Sent", "Reply sent.");
                       setSelected(null);
                     },
-                    onError: (error) => Alert.alert("Error", error.message),
+                    onError: (error) => appAlert("Error", error.message),
                   },
                 )
               }
@@ -198,8 +201,8 @@ export default function AdminHelpChatScreen() {
                     statusMutation.mutate(
                       { threadId: selected.id, status },
                       {
-                        onSuccess: () => Alert.alert("Updated", `Status → ${status}`),
-                        onError: (error) => Alert.alert("Error", error.message),
+                        onSuccess: () => appAlert("Updated", `Status → ${status}`),
+                        onError: (error) => appAlert("Error", error.message),
                       },
                     )
                   }

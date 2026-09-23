@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { Alert, Pressable, Text, View } from "react-native";
-
+import { Pressable, Text, View } from "react-native";
 import { ResourceScreen } from "@/components/shared/resource-screen";
 import { authFetch } from "@/lib/api/auth-fetch";
 import { queryKeys } from "@/lib/query/keys";
 import { asRecords, dateLabel, textValue } from "@/lib/student/presentation";
+import { appAlert } from "@/lib/ui/app-alert";
 
 export default function StudentNotificationsScreen() {
   const [markingRead, setMarkingRead] = useState<string | null>(null);
@@ -30,7 +30,7 @@ export default function StudentNotificationsScreen() {
               if (!response.ok) throw new Error(`Request failed (${response.status})`);
               await refetch();
             } catch (error) {
-              Alert.alert("Could not update notification", error instanceof Error ? error.message : "Please try again.");
+              appAlert("Could not update notification", error instanceof Error ? error.message : "Please try again.");
             } finally {
               setMarkingRead(null);
             }

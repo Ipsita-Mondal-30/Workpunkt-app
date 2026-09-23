@@ -1,10 +1,12 @@
-import { Alert, Pressable, Text, TextInput, View } from "react-native";
+import { Pressable, Text, TextInput, View } from "react-native";
 import { useState } from "react";
 
 import { ResourceScreen } from "@/components/shared/resource-screen";
 import { queryKeys } from "@/lib/query/keys";
 import { useApiMutation } from "@/lib/query/use-api";
 import { dateLabel } from "@/lib/student/presentation";
+import { useThemeColors } from "@/lib/theme/theme-context";
+import { appAlert } from "@/lib/ui/app-alert";
 
 type SupportMessage = {
   id: string;
@@ -26,6 +28,7 @@ type SupportInboxData = {
 };
 
 export default function AgentMessageTeamScreen() {
+  const colors = useThemeColors();
   const [message, setMessage] = useState("");
 
   const sendMutation = useApiMutation<
@@ -79,7 +82,7 @@ export default function AgentMessageTeamScreen() {
             value={message}
             onChangeText={setMessage}
             placeholder="Write a message to the team…"
-            placeholderTextColor="#71717a"
+            placeholderTextColor={colors.placeholder}
             multiline
             className="min-h-[96px] rounded-xl border border-border bg-surface px-3 py-3 text-sm text-text"
           />
@@ -94,9 +97,9 @@ export default function AgentMessageTeamScreen() {
                   onSuccess: () => {
                     setMessage("");
                     refetch();
-                    Alert.alert("Sent", "Your message was sent to the team.");
+                    appAlert("Sent", "Your message was sent to the team.");
                   },
-                  onError: (error) => Alert.alert("Error", error.message),
+                  onError: (error) => appAlert("Error", error.message),
                 },
               )
             }

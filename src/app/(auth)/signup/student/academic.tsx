@@ -20,7 +20,7 @@ import {
   savePrivateDraft,
   type PrivateAcademicDraft,
 } from "@/lib/signup/private-draft";
-import { useTheme } from "@/lib/theme/theme-context";
+import { useThemeColors } from "@/lib/theme/theme-context";
 import { cn } from "@/lib/utils";
 
 const EMPTY_FORM: PrivateAcademicDraft = {
@@ -40,8 +40,7 @@ type FieldErrors = Partial<Record<keyof PrivateAcademicDraft, string>>;
 
 export default function StudentAcademicScreen() {
   const router = useRouter();
-  const { isDark } = useTheme();
-  const placeholderColor = isDark ? "#a1a1aa" : "#71717a";
+  const colors = useThemeColors();
   const copy = studentAcademicCopy;
   const [form, setForm] = useState<PrivateAcademicDraft>(EMPTY_FORM);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
@@ -187,7 +186,7 @@ export default function StudentAcademicScreen() {
       <SignupField label={copy.fields.institution.label} error={fieldErrors.institution}>
         <TextInput
           placeholder={copy.fields.institution.placeholder}
-          placeholderTextColor={placeholderColor}
+          placeholderTextColor={colors.placeholder}
           value={form.institution}
           editable={!busy}
           onChangeText={(institution: string) => patch({ institution })}
@@ -198,7 +197,7 @@ export default function StudentAcademicScreen() {
       <SignupField label={copy.fields.year.label} error={fieldErrors.year} hint={copy.fields.year.hint}>
         <TextInput
           placeholder={copy.fields.year.placeholder}
-          placeholderTextColor={placeholderColor}
+          placeholderTextColor={colors.placeholder}
           keyboardType="number-pad"
           value={form.year}
           editable={!busy}
@@ -210,7 +209,7 @@ export default function StudentAcademicScreen() {
       <SignupField label={copy.fields.grade.label} error={fieldErrors.grade}>
         <TextInput
           placeholder={copy.fields.grade.placeholder}
-          placeholderTextColor={placeholderColor}
+          placeholderTextColor={colors.placeholder}
           value={form.grade}
           editable={!busy}
           onChangeText={(grade: string) => patch({ grade })}
@@ -230,7 +229,7 @@ export default function StudentAcademicScreen() {
         {form.boards === "others" ? (
           <TextInput
             placeholder={copy.fields.boardsOther.placeholder}
-            placeholderTextColor={placeholderColor}
+            placeholderTextColor={colors.placeholder}
             value={form.boardsOther}
             editable={!busy}
             onChangeText={(boardsOther: string) => patch({ boardsOther })}
@@ -242,7 +241,7 @@ export default function StudentAcademicScreen() {
       <SignupField label={copy.fields.studyGoal.label} error={fieldErrors.studyGoal}>
         <TextInput
           placeholder={copy.fields.studyGoal.placeholder}
-          placeholderTextColor={placeholderColor}
+          placeholderTextColor={colors.placeholder}
           value={form.studyGoal}
           editable={!busy}
           onChangeText={(studyGoal: string) => patch({ studyGoal })}

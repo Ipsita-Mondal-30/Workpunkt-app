@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Alert, Pressable, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 
 import { ResourceScreen } from "@/components/shared/resource-screen";
@@ -7,6 +7,7 @@ import type { AgentNotification } from "@/lib/agent/notifications";
 import { authFetch } from "@/lib/api/auth-fetch";
 import { queryKeys } from "@/lib/query/keys";
 import { dateLabel } from "@/lib/student/presentation";
+import { appAlert } from "@/lib/ui/app-alert";
 
 function nativeAgentPath(actionHref?: string) {
   if (!actionHref) return null;
@@ -40,7 +41,7 @@ export default function AgentNotificationsScreen() {
       if (!response.ok) throw new Error(`Request failed (${response.status})`);
       await refetch();
     } catch (error) {
-      Alert.alert("Could not update notifications", error instanceof Error ? error.message : "Please try again.");
+      appAlert("Could not update notifications", error instanceof Error ? error.message : "Please try again.");
     } finally {
       setUpdating(false);
     }

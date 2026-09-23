@@ -1,5 +1,6 @@
-import { Alert, Pressable, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { useState } from "react";
+import { appAlert } from "@/lib/ui/app-alert";
 
 import { DetailSheet } from "@/components/shared/detail-sheet";
 import {
@@ -170,9 +171,9 @@ export default function AdminPipelineScreen() {
                     {
                       onSuccess: () => {
                         setSelected(null);
-                        Alert.alert("Done", "Student promoted to Applications.");
+                        appAlert("Done", "Student promoted to Applications.");
                       },
-                      onError: (error) => Alert.alert("Error", error.message),
+                      onError: (error) => appAlert("Error", error.message),
                     },
                   )
                 }
@@ -196,8 +197,8 @@ export default function AdminPipelineScreen() {
                       track: selected.track,
                     },
                     {
-                      onSuccess: () => Alert.alert("Sent", "Document reminder sent."),
-                      onError: (error) => Alert.alert("Error", error.message),
+                      onSuccess: () => appAlert("Sent", "Document reminder sent."),
+                      onError: (error) => appAlert("Error", error.message),
                     },
                   )
                 }

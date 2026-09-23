@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { Alert, Pressable, Text, TextInput, View } from "react-native";
-
+import { Pressable, Text, TextInput, View } from "react-native";
 import { DetailSheet } from "@/components/shared/detail-sheet";
 import { GradientButton } from "@/components/shared/gradient-button";
 import { queryKeys } from "@/lib/query/keys";
 import { useApiMutation } from "@/lib/query/use-api";
+import { useThemeColors } from "@/lib/theme/theme-context";
+import { appAlert } from "@/lib/ui/app-alert";
 
 type StudentFormValues = {
   firstName: string;
@@ -52,6 +53,7 @@ export function StudentFormSheet({
   onClose,
   onSaved,
 }: StudentFormSheetProps) {
+  const colors = useThemeColors();
   const [form, setForm] = useState<StudentFormValues>(EMPTY_FORM);
 
   useEffect(() => {
@@ -82,15 +84,15 @@ export function StudentFormSheet({
 
   function handleSave() {
     if (!form.firstName.trim() && !form.lastName.trim()) {
-      Alert.alert("Missing name", "Enter the student's first or last name.");
+      appAlert("Missing name", "Enter the student's first or last name.");
       return;
     }
     if (!form.email.trim()) {
-      Alert.alert("Missing email", "Student email is required.");
+      appAlert("Missing email", "Student email is required.");
       return;
     }
     if (!form.dateOfBirth.trim()) {
-      Alert.alert("Missing date of birth", "Use DD/MM/YYYY format.");
+      appAlert("Missing date of birth", "Use DD/MM/YYYY format.");
       return;
     }
 
@@ -105,7 +107,7 @@ export function StudentFormSheet({
 
     if (mode === "edit") {
       if (!schoolStudentId) {
-        Alert.alert("Cannot edit", "This student is not linked for editing yet.");
+        appAlert("Cannot edit", "This student is not linked for editing yet.");
         return;
       }
       updateMutation.mutate(
@@ -115,7 +117,7 @@ export function StudentFormSheet({
             onSaved();
             onClose();
           },
-          onError: (error) => Alert.alert("Error", error.message),
+          onError: (error) => appAlert("Error", error.message),
         },
       );
       return;
@@ -126,7 +128,7 @@ export function StudentFormSheet({
         onSaved();
         onClose();
       },
-      onError: (error) => Alert.alert("Error", error.message),
+      onError: (error) => appAlert("Error", error.message),
     });
   }
 
@@ -141,21 +143,21 @@ export function StudentFormSheet({
           value={form.firstName}
           onChangeText={(value) => updateField("firstName", value)}
           placeholder="First name"
-          placeholderTextColor="#71717a"
+          placeholderTextColor={colors.placeholder}
           className="rounded-xl border border-border bg-surface px-3 py-3 text-sm text-text"
         />
         <TextInput
           value={form.lastName}
           onChangeText={(value) => updateField("lastName", value)}
           placeholder="Last name"
-          placeholderTextColor="#71717a"
+          placeholderTextColor={colors.placeholder}
           className="rounded-xl border border-border bg-surface px-3 py-3 text-sm text-text"
         />
         <TextInput
           value={form.email}
           onChangeText={(value) => updateField("email", value)}
           placeholder="Email"
-          placeholderTextColor="#71717a"
+          placeholderTextColor={colors.placeholder}
           autoCapitalize="none"
           keyboardType="email-address"
           className="rounded-xl border border-border bg-surface px-3 py-3 text-sm text-text"
@@ -164,14 +166,14 @@ export function StudentFormSheet({
           value={form.dateOfBirth}
           onChangeText={(value) => updateField("dateOfBirth", value)}
           placeholder="Date of birth (DD/MM/YYYY)"
-          placeholderTextColor="#71717a"
+          placeholderTextColor={colors.placeholder}
           className="rounded-xl border border-border bg-surface px-3 py-3 text-sm text-text"
         />
         <TextInput
           value={form.phoneNumber}
           onChangeText={(value) => updateField("phoneNumber", value)}
           placeholder="Phone (optional)"
-          placeholderTextColor="#71717a"
+          placeholderTextColor={colors.placeholder}
           keyboardType="phone-pad"
           className="rounded-xl border border-border bg-surface px-3 py-3 text-sm text-text"
         />
@@ -179,7 +181,7 @@ export function StudentFormSheet({
           value={form.gender}
           onChangeText={(value) => updateField("gender", value)}
           placeholder="Gender (optional)"
-          placeholderTextColor="#71717a"
+          placeholderTextColor={colors.placeholder}
           className="rounded-xl border border-border bg-surface px-3 py-3 text-sm text-text"
         />
 

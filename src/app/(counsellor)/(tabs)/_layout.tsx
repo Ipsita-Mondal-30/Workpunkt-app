@@ -1,20 +1,24 @@
 import { Tabs } from "expo-router";
 import { Text } from "react-native";
 
+import { useThemeColors } from "@/lib/theme/theme-context";
+
 function TabIcon({ label }: { label: string }) {
   return <Text style={{ fontSize: 18 }}>{label}</Text>;
 }
 
 export default function CounsellorTabsLayout() {
+  const colors = useThemeColors();
+
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: "#f6339a",
-        tabBarInactiveTintColor: "#64748b",
+        tabBarActiveTintColor: colors.brandMid,
+        tabBarInactiveTintColor: colors.muted,
         tabBarStyle: {
-          borderTopColor: "rgba(148,163,184,0.25)",
-          backgroundColor: "transparent",
+          borderTopColor: colors.border,
+          backgroundColor: colors.surface,
         },
       }}
     >

@@ -1,4 +1,4 @@
-import { Alert, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import * as WebBrowser from "expo-web-browser";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -7,6 +7,7 @@ import { ResourceScreen } from "@/components/shared/resource-screen";
 import { StatsRow } from "@/components/shared/stats-row";
 import { authFetch } from "@/lib/api/auth-fetch";
 import { queryKeys } from "@/lib/query/keys";
+import { appAlert } from "@/lib/ui/app-alert";
 
 type EntitlementsMeSummary = {
   agentPlan: {
@@ -64,7 +65,7 @@ export default function AgentPaymentsScreen() {
       await queryClient.invalidateQueries({ queryKey: queryKeys.entitlementsMe() });
     },
     onError: (error) => {
-      Alert.alert("Checkout error", error.message);
+      appAlert("Checkout error", error.message);
     },
   });
 

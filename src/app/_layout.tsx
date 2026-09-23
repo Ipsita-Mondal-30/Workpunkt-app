@@ -9,6 +9,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { BootErrorBoundary } from "@/components/shared/boot-error-boundary";
+import { AppAlertHost } from "@/components/shared/app-alert";
 import { WorkpunktLoader } from "@/components/shared/workpunkt-loader";
 import { AuthProvider, useAuth } from "@/lib/auth/auth-context";
 import { useAuthDeepLinks } from "@/lib/auth/use-auth-deep-links";
@@ -91,6 +92,7 @@ export default function RootLayout() {
             <AppQueryProvider>
               <AuthProvider>
                 <RootNavigator />
+                <AppAlertHost />
               </AuthProvider>
             </AppQueryProvider>
           </ThemeProvider>

@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Alert, Text, TextInput, View } from "react-native";
+import { Text, TextInput, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { appAlert } from "@/lib/ui/app-alert";
 
 import { CounsellorScroll, SectionCard } from "@/components/counsellor/counsellor-scroll";
 import { CounsellorScreenShell } from "@/components/counsellor/counsellor-screen-shell";
@@ -60,7 +61,7 @@ export default function AddStudentScreen() {
   async function submitCp() {
     const error = validateCpStudentForm(cpForm);
     if (error) {
-      Alert.alert("Validation", error);
+      appAlert("Validation", error);
       return;
     }
 
@@ -94,10 +95,10 @@ export default function AddStudentScreen() {
         throw new Error(json.error ?? "Could not create student.");
       }
       await refresh();
-      Alert.alert("Success", json.message ?? "Student added.");
+      appAlert("Success", json.message ?? "Student added.");
       router.back();
     } catch (error) {
-      Alert.alert(
+      appAlert(
         "Error",
         error instanceof Error ? error.message : "Could not create student.",
       );
@@ -109,7 +110,7 @@ export default function AddStudentScreen() {
   async function submitEnrolled() {
     const error = validateEnrolledStudentForm(enrolledForm);
     if (error) {
-      Alert.alert("Validation", error);
+      appAlert("Validation", error);
       return;
     }
 
@@ -136,10 +137,10 @@ export default function AddStudentScreen() {
         throw new Error(json.error ?? "Could not create application.");
       }
       await refresh();
-      Alert.alert("Success", json.message ?? "Application created.");
+      appAlert("Success", json.message ?? "Application created.");
       router.back();
     } catch (error) {
-      Alert.alert(
+      appAlert(
         "Error",
         error instanceof Error ? error.message : "Could not create application.",
       );

@@ -1,5 +1,6 @@
-import { Alert, Pressable, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { useState } from "react";
+import { appAlert } from "@/lib/ui/app-alert";
 
 import { DetailSheet } from "@/components/shared/detail-sheet";
 import {
@@ -149,7 +150,7 @@ export default function AdminLeadsScreen() {
                 className="mt-2 rounded-xl bg-brand-mid px-4 py-3"
                 disabled={promote.isPending}
                 onPress={() => {
-                  Alert.alert("Promote lead", "Move this lead to Student Pipeline?", [
+                  appAlert("Promote lead", "Move this lead to Student Pipeline?", [
                     { text: "Cancel", style: "cancel" },
                     {
                       text: "Promote",
@@ -159,9 +160,9 @@ export default function AdminLeadsScreen() {
                           {
                             onSuccess: () => {
                               setSelected(null);
-                              Alert.alert("Done", "Lead promoted to Student Pipeline.");
+                              appAlert("Done", "Lead promoted to Student Pipeline.");
                             },
-                            onError: (error) => Alert.alert("Error", error.message),
+                            onError: (error) => appAlert("Error", error.message),
                           },
                         );
                       },

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Alert, Pressable, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import * as DocumentPicker from "expo-document-picker";
 
@@ -10,6 +10,7 @@ import { publicPostJson } from "@/lib/api/public-fetch";
 import { studentUploadCopy } from "@/lib/signup/copy";
 import { PRIVATE_OPTIONAL_DOCUMENTS, PRIVATE_REQUIRED_DOCUMENTS } from "@/lib/signup/form-options";
 import { clearPrivateDraft, loadPrivateDraft } from "@/lib/signup/private-draft";
+import { appAlert } from "@/lib/ui/app-alert";
 
 type PickedDoc = { id: string; fileName: string; uri: string; mimeType?: string };
 
@@ -162,7 +163,7 @@ export default function StudentUploadScreen() {
       <Pressable
         className="mt-4 py-2"
         onPress={() =>
-          Alert.alert(
+          appAlert(
             "Submit incomplete?",
             "You can submit now and upload remaining documents later.",
             [

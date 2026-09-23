@@ -1,7 +1,8 @@
-import { Alert, Linking, Text, View } from "react-native";
+import { Linking, Text, View } from "react-native";
 import { useState } from "react";
 import { useRouter } from "expo-router";
 import { useQuery } from "@tanstack/react-query";
+import { appAlert } from "@/lib/ui/app-alert";
 
 import {
   CounsellorScroll,
@@ -71,7 +72,7 @@ export default function TrainingScreen() {
       }
       await trainingQuery.refetch();
     } catch (error) {
-      Alert.alert(
+      appAlert(
         "Error",
         error instanceof Error ? error.message : "Could not save progress.",
       );

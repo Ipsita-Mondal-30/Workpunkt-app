@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Alert, Pressable, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 
 import { FormField } from "@/components/portal/form-field";
@@ -9,6 +9,7 @@ import { UNIVERSITY_TYPE_OPTIONS, emptyEnrolledStudentForm, type EnrolledStudent
 import { queryKeys } from "@/lib/query/keys";
 import { useApiMutation } from "@/lib/query/use-api";
 import { cn } from "@/lib/utils";
+import { appAlert } from "@/lib/ui/app-alert";
 
 type FieldErrors = Partial<Record<keyof EnrolledStudentFormValues, string>>;
 
@@ -56,7 +57,7 @@ export default function AgentAddStudentScreen() {
       },
     }, {
       onSuccess: (result) => {
-        Alert.alert("Student added", result.message ?? "The application was created and linked to your account.", [
+        appAlert("Student added", result.message ?? "The application was created and linked to your account.", [
           { text: "View students", onPress: () => router.replace("/(agent)/students") },
         ]);
       },

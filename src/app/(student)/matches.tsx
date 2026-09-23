@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { Alert, Pressable, Text, View } from "react-native";
-
+import { Pressable, Text, View } from "react-native";
 import { ResourceScreen } from "@/components/shared/resource-screen";
 import { queryKeys } from "@/lib/query/keys";
 import { postApiJson } from "@/lib/query/use-api";
 import { asRecords, textValue, type UnknownRecord } from "@/lib/student/presentation";
 import { cn } from "@/lib/utils";
+import { appAlert } from "@/lib/ui/app-alert";
 
 function programName(item: UnknownRecord) {
   return textValue(item, "degreeName", "programName", "program", "name", "title") || "Matched program";
@@ -80,9 +80,9 @@ export default function StudentMatchesScreen() {
                         try {
                           await postApiJson(`/api/matches/${id}/approve`);
                           await refetch();
-                          Alert.alert("Confirmed", "Your counsellor can now proceed with this application.");
+                          appAlert("Confirmed", "Your counsellor can now proceed with this application.");
                         } catch (error) {
-                          Alert.alert("Could not confirm", error instanceof Error ? error.message : "Please try again.");
+                          appAlert("Could not confirm", error instanceof Error ? error.message : "Please try again.");
                         } finally {
                           setPendingDecision(null);
                         }
@@ -94,14 +94,14 @@ export default function StudentMatchesScreen() {
                     {status !== "approved" ? (
                       <Pressable
                         disabled={!pending || pendingDecision !== null}
-                        onPress={() => Alert.alert("Reject this program?", "It will be removed from your active options.", [{ text: "Cancel", style: "cancel" }, { text: "Reject", style: "destructive", onPress: async () => {
+                        onPress={() => appAlert("Reject this program?", "It will be removed from your active options.", [{ text: "Cancel", style: "cancel" }, { text: "Reject", style: "destructive", onPress: async () => {
                           if (!id) return;
                           setPendingDecision(`${id}:reject`);
                           try {
                             await postApiJson(`/api/matches/${id}/reject`);
                             await refetch();
                           } catch (error) {
-                            Alert.alert("Could not reject", error instanceof Error ? error.message : "Please try again.");
+                            appAlert("Could not reject", error instanceof Error ? error.message : "Please try again.");
                           } finally {
                             setPendingDecision(null);
                           }

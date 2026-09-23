@@ -15,7 +15,7 @@ import { studentSignUpCopy } from "@/lib/signup/copy";
 import { normalizeLeadEmail } from "@/lib/signup/email";
 import { labelForPrivateLeadSource, PRIVATE_LEAD_SOURCE_OPTIONS } from "@/lib/signup/form-options";
 import { loadPrivateDraft, savePrivateDraft } from "@/lib/signup/private-draft";
-import { useTheme } from "@/lib/theme/theme-context";
+import { useThemeColors } from "@/lib/theme/theme-context";
 
 type FieldErrors = {
   firstName?: string;
@@ -34,8 +34,7 @@ type SignupApiResult = {
 
 export default function StudentSignupScreen() {
   const router = useRouter();
-  const { isDark } = useTheme();
-  const placeholderColor = isDark ? "#a1a1aa" : "#71717a";
+  const colors = useThemeColors();
   const copy = studentSignUpCopy;
 
   const [firstName, setFirstName] = useState("");
@@ -156,7 +155,7 @@ export default function StudentSignupScreen() {
           <TextInput
             autoComplete="given-name"
             placeholder={copy.fields.firstName.placeholder}
-            placeholderTextColor={placeholderColor}
+            placeholderTextColor={colors.placeholder}
             value={firstName}
             editable={!busy}
             onChangeText={(value: string) => {
@@ -170,7 +169,7 @@ export default function StudentSignupScreen() {
           <TextInput
             autoComplete="family-name"
             placeholder={copy.fields.lastName.placeholder}
-            placeholderTextColor={placeholderColor}
+            placeholderTextColor={colors.placeholder}
             value={lastName}
             editable={!busy}
             onChangeText={(value: string) => {
@@ -188,7 +187,7 @@ export default function StudentSignupScreen() {
           autoComplete="email"
           keyboardType="email-address"
           placeholder={copy.fields.email.placeholder}
-          placeholderTextColor={placeholderColor}
+          placeholderTextColor={colors.placeholder}
           value={email}
           editable={!busy}
           onChangeText={(value: string) => {

@@ -1,10 +1,10 @@
 import * as WebBrowser from "expo-web-browser";
-import { Alert, Linking } from "react-native";
-
+import { Linking } from "react-native";
 import {
   isValidHttpUrl,
   resolvePublicUrl,
 } from "@/lib/config/public-env";
+import { appAlert } from "@/lib/ui/app-alert";
 
 /**
  * Open a website path or absolute URL in the system / in-app browser.
@@ -13,7 +13,7 @@ export async function openExternalUrl(pathOrUrl: string): Promise<void> {
   const url = resolvePublicUrl(pathOrUrl);
 
   if (!isValidHttpUrl(url)) {
-    Alert.alert(
+    appAlert(
       "Can't open link",
       "Set EXPO_PUBLIC_API_URL to your Workpunkt site (for example http://10.x.x.x:3001).",
     );
@@ -29,6 +29,6 @@ export async function openExternalUrl(pathOrUrl: string): Promise<void> {
       await Linking.openURL(url);
       return;
     }
-    Alert.alert("Can't open link", url);
+    appAlert("Can't open link", url);
   }
 }

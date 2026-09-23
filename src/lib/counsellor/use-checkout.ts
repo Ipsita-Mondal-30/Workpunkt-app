@@ -1,9 +1,9 @@
-import { Alert } from "react-native";
 import * as WebBrowser from "expo-web-browser";
 import { useMutation } from "@tanstack/react-query";
 
 import { authFetch } from "@/lib/api/auth-fetch";
 import type { CheckoutProductType } from "@/lib/counsellor/types";
+import { appAlert } from "@/lib/ui/app-alert";
 
 export function useCheckout(productType: CheckoutProductType) {
   return useMutation({
@@ -32,7 +32,7 @@ export function useCheckout(productType: CheckoutProductType) {
       await WebBrowser.openBrowserAsync(url);
     },
     onError: (error) => {
-      Alert.alert("Checkout error", error.message);
+      appAlert("Checkout error", error.message);
     },
   });
 }

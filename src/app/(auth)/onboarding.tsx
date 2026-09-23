@@ -6,7 +6,7 @@ import { SignupShell } from "@/components/auth/signup-shell";
 import { GradientButton } from "@/components/shared/gradient-button";
 import { postApiJson } from "@/lib/query/use-api";
 import { useAuth } from "@/lib/auth/auth-context";
-import { useTheme } from "@/lib/theme/theme-context";
+import { useThemeColors } from "@/lib/theme/theme-context";
 import { cn } from "@/lib/utils";
 
 const FIELDS = [
@@ -37,8 +37,7 @@ const SUBJECTS = [
 export default function OnboardingScreen() {
   const router = useRouter();
   const { profile, homePath, refreshProfile } = useAuth();
-  const { isDark } = useTheme();
-  const placeholderColor = isDark ? "#a1a1aa" : "#71717a";
+  const colors = useThemeColors();
   const [values, setValues] = useState<Record<string, string>>({
     fullName: profile?.name ?? "",
     email: profile?.email ?? "",
@@ -101,7 +100,7 @@ export default function OnboardingScreen() {
         <TextInput
           key={field.key}
           placeholder={field.label}
-          placeholderTextColor={placeholderColor}
+          placeholderTextColor={colors.placeholder}
           autoCapitalize={field.key === "email" ? "none" : "sentences"}
           keyboardType={field.key === "email" ? "email-address" : "default"}
           value={values[field.key] ?? ""}

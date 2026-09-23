@@ -1,15 +1,18 @@
-import { Alert, Pressable, Text, TextInput, View } from "react-native";
+import { Pressable, Text, TextInput, View } from "react-native";
 import { useState } from "react";
 
 import { ResourceScreen } from "@/components/shared/resource-screen";
 import { queryKeys } from "@/lib/query/keys";
 import { useApiMutation } from "@/lib/query/use-api";
 import { dateLabel } from "@/lib/student/presentation";
+import { useThemeColors } from "@/lib/theme/theme-context";
+import { appAlert } from "@/lib/ui/app-alert";
 
 type SupportMessage = { id: string; senderRole: string; senderName: string; body: string; createdAt: string };
 type SupportInbox = { threadId: string | null; thread: { id: string; subject: string; status: string } | null; messages: SupportMessage[] };
 
 export default function StudentSupportScreen() {
+  const colors = useThemeColors();
   const [message, setMessage] = useState("");
   const send = useApiMutation<{ kind: "student_help"; message: string }, unknown>("/api/support/inbox", [queryKeys.supportInbox()]);
   return (
@@ -32,8 +35,8 @@ export default function StudentSupportScreen() {
               </View>
             ))}
           </View>
-          <TextInput value={message} onChangeText={setMessage} placeholder="Message your counsellor…" placeholderTextColor="#71717a" multiline className="mt-5 min-h-[100px] rounded-2xl border border-border bg-surface px-4 py-3 text-sm text-text" />
-          <Pressable disabled={send.isPending || !message.trim()} onPress={() => send.mutate({ kind: "student_help", message: message.trim() }, { onSuccess: () => { setMessage(""); refetch(); }, onError: (error) => Alert.alert("Could not send", error.message) })} className="mt-3 rounded-xl bg-brand-mid px-4 py-3">
+          <TextInput value={message} onChangeText={setMessage} placeholder="Message your counsellor…" placeholderTextColor={colors.placeholder} multiline className="mt-5 min-h-[100px] rounded-2xl border border-border bg-surface px-4 py-3 text-sm text-text" />
+          <Pressable disabled={send.isPending || !message.trim()} onPress={() => send.mutate({ kind: "student_help", message: message.trim() }, { onSuccess: () => { setMessage(""); refetch(); }, onError: (error) => appAlert("Could not send", error.message) })} className="mt-3 rounded-xl bg-brand-mid px-4 py-3">
             <Text className="text-center text-sm font-bold text-white">{send.isPending ? "Sending…" : "Send message"}</Text>
           </Pressable>
         </View>

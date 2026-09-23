@@ -5,6 +5,7 @@ import { useRouter } from "expo-router";
 import { ResourceScreen } from "@/components/shared/resource-screen";
 import { agentStudentsFromBundle, type AgentStudentListItem, type AgentStudentsBundle } from "@/lib/agent/students";
 import { queryKeys } from "@/lib/query/keys";
+import { useThemeColors } from "@/lib/theme/theme-context";
 
 function filterStudents(items: AgentStudentListItem[], query: string) {
   const normalized = query.trim().toLowerCase();
@@ -20,6 +21,7 @@ function filterStudents(items: AgentStudentListItem[], query: string) {
 }
 
 function AgentStudentsList({ data }: { data: AgentStudentsBundle }) {
+  const colors = useThemeColors();
   const router = useRouter();
   const [filter, setFilter] = useState("");
 
@@ -32,7 +34,7 @@ function AgentStudentsList({ data }: { data: AgentStudentsBundle }) {
         value={filter}
         onChangeText={setFilter}
         placeholder="Filter by name, email, or status…"
-        placeholderTextColor="#71717a"
+        placeholderTextColor={colors.placeholder}
         className="mb-4 rounded-xl border border-border bg-surface px-3 py-3 text-sm text-text"
       />
 

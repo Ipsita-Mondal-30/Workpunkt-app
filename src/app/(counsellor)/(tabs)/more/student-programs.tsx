@@ -1,6 +1,7 @@
-import { Alert, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
+import { appAlert } from "@/lib/ui/app-alert";
 
 import {
   CounsellorScroll,
@@ -69,7 +70,7 @@ export default function CounsellorStudentProgramsScreen() {
                 await refresh();
                 return;
               }
-              Alert.alert(
+              appAlert(
                 "Payment sync issue",
                 result.error ||
                   "Stripe may have charged you, but access was not unlocked yet. Pull to refresh or try again.",

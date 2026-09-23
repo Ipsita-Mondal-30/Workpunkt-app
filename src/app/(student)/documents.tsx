@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ActivityIndicator, Alert, Pressable, Text, View } from "react-native";
+import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
 
 import { GradientButton } from "@/components/shared/gradient-button";
@@ -13,6 +13,7 @@ import { collectDocuments, textValue } from "@/lib/student/presentation";
 import { createUuid } from "@/lib/utils";
 import { DocumentPreview, type PreviewDocument } from "@/components/portal/document-preview";
 import { EmptyState, PortalIcon, ProgressBar } from "@/components/portal/portal-ui";
+import { appAlert } from "@/lib/ui/app-alert";
 
 const DOCUMENTS = [...PRIVATE_REQUIRED_DOCUMENTS, ...PRIVATE_OPTIONAL_DOCUMENTS];
 
@@ -55,7 +56,7 @@ export default function StudentDocumentsScreen() {
       setMessage(`${json.data?.fileName ?? asset.name} uploaded successfully.`);
       await refetch();
     } catch (error) {
-      Alert.alert("Upload failed", error instanceof Error ? error.message : "Please try again.");
+      appAlert("Upload failed", error instanceof Error ? error.message : "Please try again.");
     } finally {
       setUploading(null);
     }
