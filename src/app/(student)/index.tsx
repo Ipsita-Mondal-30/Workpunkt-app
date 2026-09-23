@@ -21,9 +21,15 @@ const SHORTCUTS = [
 export default function StudentHome() {
   const { profile } = useAuth();
   const router = useRouter();
-  const applications = useApiQuery<unknown>(queryKeys.studentApplications(), "/api/applications");
-  const matches = useApiQuery<unknown>(queryKeys.matches(), "/api/matches");
-  const notifications = useApiQuery<unknown>(queryKeys.studentNotifications(), "/api/notifications", { staleTime: 30_000 });
+  const applications = useApiQuery<unknown>(queryKeys.studentApplications(), "/api/applications", {
+    cachePolicy: "standard",
+  });
+  const matches = useApiQuery<unknown>(queryKeys.matches(), "/api/matches", {
+    cachePolicy: "standard",
+  });
+  const notifications = useApiQuery<unknown>(queryKeys.studentNotifications(), "/api/notifications", {
+    cachePolicy: "live",
+  });
   const appItems = applicationRecords(applications.data);
   const matchItems = asRecords(matches.data);
   const unread = asRecords(notifications.data).filter((item) => item.isRead !== true && item.read !== true).length;

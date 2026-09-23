@@ -27,7 +27,7 @@ function loadDotEnv(filePath) {
 module.exports = () => {
   const env = loadDotEnv(path.join(__dirname, ".env"));
 
-  const apiUrl = (env.EXPO_PUBLIC_API_URL ?? "http://localhost:3001").replace(
+  const apiUrl = (env.EXPO_PUBLIC_API_URL ?? "https://www.workpunkt.com").replace(
     /\/$/,
     "",
   );

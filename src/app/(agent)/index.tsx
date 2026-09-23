@@ -77,7 +77,7 @@ export default function AgentHome() {
   const notifications = useApiQuery<AgentNotification[]>(
     queryKeys.agentNotifications(),
     "/api/agent/notifications",
-    { staleTime: 30_000 },
+    { cachePolicy: "live" },
   );
   const unread = (notifications.data ?? []).filter((item) => !item.isRead).length;
 

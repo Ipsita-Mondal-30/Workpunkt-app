@@ -13,6 +13,7 @@ import { StatsRow, type StatCard } from "@/components/shared/stats-row";
 import { useAuth } from "@/lib/auth/auth-context";
 import { queryKeys } from "@/lib/query/keys";
 import { useApiQuery } from "@/lib/query/use-api";
+import { useTheme } from "@/lib/theme/theme-context";
 
 const PAGE_GUTTER = 20;
 const CARD_GAP = 12;
@@ -128,16 +129,21 @@ function buildStats(data: CommandCentreData): StatCard[] {
 
 export default function AdminHome() {
   const { profile } = useAuth();
+  const { isDark } = useTheme();
   const router = useRouter();
   const { width: windowWidth } = useWindowDimensions();
   const query = useApiQuery<CommandCentreData>(
     queryKeys.adminCommandCentre(),
     "/api/admin/command-centre",
-    { staleTime: 60_000 },
+    { cachePolicy: "heavy" },
   );
 
   const cardWidth = Math.max(240, windowWidth - PAGE_GUTTER - NEXT_PEEK);
   const data = query.data;
+  const textColor = isDark ? "#ffffff" : "#0e0b11";
+  const mutedColor = isDark ? "#a1a1aa" : "#71717a";
+  const surfaceBg = isDark ? "#18151c" : "#ffffff";
+  const borderColor = isDark ? "#2e2a33" : "#e4e4e7";
 
   return (
     <PortalPage
@@ -177,8 +183,11 @@ export default function AdminHome() {
       {data ? <StatsRow stats={buildStats(data)} scrollable /> : null}
 
       {data?.attention?.length ? (
-        <View className="mb-6 gap-2">
-          <Text accessibilityRole="header" className="mb-1 text-lg font-bold text-text">
+        <View style={{ marginBottom: 24, gap: 8 }}>
+          <Text
+            accessibilityRole="header"
+            style={{ marginBottom: 4, fontSize: 18, fontWeight: "700", color: textColor }}
+          >
             Needs attention
           </Text>
           {data.attention.slice(0, 3).map((item) => {
@@ -191,12 +200,23 @@ export default function AdminHome() {
                 onPress={() => {
                   if (href) router.push(href as never);
                 }}
-                className="rounded-2xl border border-border bg-surface px-4 py-3"
+                style={{
+                  borderRadius: 16,
+                  borderWidth: 1,
+                  borderColor,
+                  backgroundColor: surfaceBg,
+                  paddingHorizontal: 16,
+                  paddingVertical: 12,
+                }}
               >
-                <Text className="text-sm font-semibold text-text">{item.title}</Text>
-                <Text className="mt-1 text-xs leading-5 text-muted">{item.subtitle}</Text>
+                <Text style={{ fontSize: 14, fontWeight: "600", color: textColor }}>
+                  {item.title}
+                </Text>
+                <Text style={{ marginTop: 4, fontSize: 12, lineHeight: 18, color: mutedColor }}>
+                  {item.subtitle}
+                </Text>
                 {href ? (
-                  <Text className="mt-2 text-xs font-semibold text-brand-mid">
+                  <Text style={{ marginTop: 8, fontSize: 12, fontWeight: "600", color: "#f6339a" }}>
                     {item.action} →
                   </Text>
                 ) : null}
@@ -206,10 +226,13 @@ export default function AdminHome() {
         </View>
       ) : null}
 
-      <Text accessibilityRole="header" className="mb-3 text-lg font-bold text-text">
+      <Text
+        accessibilityRole="header"
+        style={{ marginBottom: 8, fontSize: 18, fontWeight: "700", color: textColor }}
+      >
         Manage your workspace
       </Text>
-      <Text className="mb-4 text-sm leading-5 text-muted">
+      <Text style={{ marginBottom: 16, fontSize: 14, lineHeight: 20, color: mutedColor }}>
         Swipe to browse modules
         {data?.pipeline?.activeCount != null
           ? ` · ${data.pipeline.activeCount} active students in pipeline`
@@ -217,7 +240,7 @@ export default function AdminHome() {
         .
       </Text>
 
-      <View style={{ marginHorizontal: -PAGE_GUTTER }} className="mb-2">
+      <View style={{ marginHorizontal: -PAGE_GUTTER, marginBottom: 8 }}>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}

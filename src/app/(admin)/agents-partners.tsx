@@ -67,11 +67,17 @@ export default function AdminAgentsPartnersScreen() {
   const approve = useApiMutation<
     { airtableRecordId: string; kind?: "agent" | "counsellor" },
     { ok: boolean; error?: string }
-  >("/api/admin/agents-partners/approve", [queryKeys.adminAgentsPartners()]);
+  >("/api/admin/agents-partners/approve", [
+    queryKeys.adminAgentsPartners(),
+    queryKeys.adminCommandCentre(),
+  ]);
   const decline = useApiMutation<
     { airtableRecordId: string; kind?: "agent" | "counsellor" },
     { ok: boolean; error?: string }
-  >("/api/admin/agents-partners/decline", [queryKeys.adminAgentsPartners()]);
+  >("/api/admin/agents-partners/decline", [
+    queryKeys.adminAgentsPartners(),
+    queryKeys.adminCommandCentre(),
+  ]);
   const resend = useApiMutation<
     { airtableRecordId: string; kind?: "agent" | "counsellor" },
     { ok: boolean; error?: string }
@@ -83,11 +89,17 @@ export default function AdminAgentsPartnersScreen() {
   const payStatus = useApiMutation<
     { counsellorRecordId: string; payStatus: "Paid" | "Unpaid" },
     { ok: boolean; error?: string }
-  >("/api/admin/agents-partners/pay-status", [queryKeys.adminAgentsPartners()]);
+  >("/api/admin/agents-partners/pay-status", [
+    queryKeys.adminAgentsPartners(),
+    queryKeys.adminCommandCentre(),
+  ]);
   const startChat = useApiMutation<
     { agentName: string; agentEmail: string },
     { ok: boolean; threadId?: string; error?: string }
-  >("/api/admin/agents-partners/start-chat", [queryKeys.supportInboxAdmin()]);
+  >("/api/admin/agents-partners/start-chat", [
+    queryKeys.supportInboxAdmin(),
+    queryKeys.adminCommandCentre(),
+  ]);
 
   const appColumns: DataColumn<AgentApplication>[] = [
     {

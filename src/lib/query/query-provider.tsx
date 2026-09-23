@@ -3,6 +3,8 @@ import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { AppState, type AppStateStatus, Platform } from "react-native";
 
+import { CACHE_MS, cacheOptions } from "@/lib/query/cache-policy";
+
 function onAppStateChange(status: AppStateStatus) {
   if (Platform.OS !== "web") {
     focusManager.setFocused(status === "active");
@@ -15,11 +17,14 @@ export function AppQueryProvider({ children }: { children: ReactNode }) {
       new QueryClient({
         defaultOptions: {
           queries: {
-            staleTime: 1000 * 60 * 5,
-            gcTime: 1000 * 60 * 30,
-            retry: 2,
-            refetchOnReconnect: true,
-            refetchOnWindowFocus: true,
+            ...cacheOptions("standard"),
+            staleTime: CACHE_MS.standard,
+            gcTime: CACHE_MS.gc,
+            // Avoid refetch storms when switching apps; pull-to-refresh + mutations invalidate.
+            refetchOnWindowFocus: false,
+          },
+          mutations: {
+            retry: 0,
           },
         },
       }),

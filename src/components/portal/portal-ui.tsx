@@ -67,10 +67,18 @@ export function ActionTile({
   /** `rail` stacks content for peek carousels; `row` is the default list tile. */
   variant?: "row" | "rail";
 }) {
+  const { isDark } = useTheme();
   const isRail = variant === "rail";
+  const textColor = isDark ? "#ffffff" : "#0e0b11";
+  const mutedColor = isDark ? "#a1a1aa" : "#71717a";
+  const surfaceBg = isDark ? "#18151c" : "#ffffff";
+  const borderColor = isDark ? "#2e2a33" : "#e4e4e7";
+  const iconWell = isDark ? "rgba(186, 67, 237, 0.16)" : "rgba(173, 70, 255, 0.1)";
+
   return (
     <Pressable
       accessibilityRole="button"
+      accessibilityLabel={`${title}. ${description}`}
       onPress={onPress}
       style={({ pressed }) => ({
         opacity: pressed ? 0.72 : 1,
@@ -78,26 +86,60 @@ export function ActionTile({
         flexGrow: width != null ? 0 : 1,
         flexShrink: width != null ? 0 : 1,
         flexBasis: width != null ? undefined : 240,
-        minHeight: isRail ? 148 : undefined,
+        minHeight: isRail ? 156 : undefined,
+        flexDirection: isRail ? "column" : "row",
+        alignItems: isRail ? "stretch" : "center",
+        justifyContent: isRail ? "space-between" : "flex-start",
+        gap: isRail ? 0 : 16,
+        borderRadius: 16,
+        borderWidth: 1,
+        borderColor,
+        backgroundColor: surfaceBg,
+        padding: 16,
       })}
-      className={
-        isRail
-          ? "justify-between rounded-2xl border border-border bg-surface p-4"
-          : "flex-row items-center gap-4 rounded-2xl border border-border bg-surface p-4"
-      }
     >
-      <View className="h-11 w-11 items-center justify-center rounded-2xl bg-brand-start/10">
+      <View
+        style={{
+          height: 44,
+          width: 44,
+          alignItems: "center",
+          justifyContent: "center",
+          borderRadius: 16,
+          backgroundColor: iconWell,
+        }}
+      >
         <PortalIcon name={icon} />
       </View>
-      <View className={isRail ? "mt-3 flex-1" : "flex-1"}>
-        <Text className="text-sm font-bold text-text" numberOfLines={2}>
+      <View style={{ marginTop: isRail ? 12 : 0, flex: 1, minWidth: 0 }}>
+        <Text
+          numberOfLines={2}
+          style={{
+            fontSize: 14,
+            fontWeight: "700",
+            color: textColor,
+            lineHeight: 20,
+          }}
+        >
           {title}
         </Text>
-        <Text className="mt-1 text-xs leading-5 text-muted" numberOfLines={isRail ? 3 : 2}>
+        <Text
+          numberOfLines={isRail ? 3 : 2}
+          style={{
+            marginTop: 4,
+            fontSize: 12,
+            lineHeight: 18,
+            color: mutedColor,
+          }}
+        >
           {description}
         </Text>
       </View>
-      <View className={isRail ? "mt-3 items-end" : undefined}>
+      <View
+        style={{
+          marginTop: isRail ? 12 : 0,
+          alignItems: isRail ? "flex-end" : "center",
+        }}
+      >
         <PortalIcon name="arrow" size={16} />
       </View>
     </Pressable>

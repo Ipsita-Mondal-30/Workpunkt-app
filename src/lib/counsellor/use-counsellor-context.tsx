@@ -14,6 +14,8 @@ import type {
   EntitlementsMeResponse,
   SchoolCounsellorContext,
 } from "@/lib/api/counsellor-types";
+import { cacheOptions } from "@/lib/query/cache-policy";
+import { queryKeys } from "@/lib/query/keys";
 
 type CounsellorContextValue = {
   loading: boolean;
@@ -79,23 +81,26 @@ async function fetchCareerPathing(): Promise<CareerPathingBundle | null> {
 export function CounsellorProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient();
 
-  const meQuery = useQuery({
-    queryKey: ["counsellor", "me"],
+  const meQuery = useQuery<AgentMeResponse>({
+    queryKey: queryKeys.counsellorMe(),
     queryFn: fetchMe,
+    ...cacheOptions("standard"),
   });
 
   const isAgentActive = meQuery.data?.profile.isAgentActive ?? false;
 
-  const entitlementsQuery = useQuery({
-    queryKey: ["counsellor", "entitlements"],
+  const entitlementsQuery = useQuery<EntitlementsMeResponse>({
+    queryKey: queryKeys.counsellorEntitlements(),
     queryFn: fetchEntitlements,
     enabled: isAgentActive,
+    ...cacheOptions("standard"),
   });
 
-  const careerPathingQuery = useQuery({
-    queryKey: ["counsellor", "career-pathing"],
+  const careerPathingQuery = useQuery<CareerPathingBundle | null>({
+    queryKey: queryKeys.counsellorCareerPathing(),
     queryFn: fetchCareerPathing,
     enabled: isAgentActive,
+    ...cacheOptions("heavy"),
   });
 
   const context = meQuery.data?.schoolCounsellorContext ?? null;
@@ -106,12 +111,7 @@ export function CounsellorProvider({ children }: { children: ReactNode }) {
 
   const refresh = useCallback(async () => {
     await Promise.all([
-      queryClient.invalidateQueries({ queryKey: ["counsellor", "me"] }),
-      queryClient.invalidateQueries({ queryKey: ["counsellor", "entitlements"] }),
-      queryClient.invalidateQueries({ queryKey: ["counsellor", "career-pathing"] }),
-      queryClient.invalidateQueries({ queryKey: ["counsellor", "students"] }),
-      queryClient.invalidateQueries({ queryKey: ["counsellor", "resources"] }),
-      queryClient.invalidateQueries({ queryKey: ["counsellor", "training"] }),
+      queryClient.invalidateQueries({ queryKey: queryKeys.scopes.counsellor() }),
     ]);
   }, [queryClient]);
 

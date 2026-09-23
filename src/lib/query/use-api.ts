@@ -7,6 +7,10 @@ import {
 } from "@tanstack/react-query";
 
 import { authFetch } from "@/lib/api/auth-fetch";
+import {
+  cacheOptions,
+  type CachePolicy,
+} from "@/lib/query/cache-policy";
 
 type ApiEnvelope<T> = {
   data?: T;
@@ -60,12 +64,23 @@ export async function postApiJson<T>(
 export function useApiQuery<T>(
   queryKey: QueryKey,
   path: string,
-  options?: Omit<UseQueryOptions<T, Error>, "queryKey" | "queryFn">,
+  options?: Omit<UseQueryOptions<T, Error>, "queryKey" | "queryFn"> & {
+    cachePolicy?: CachePolicy;
+  },
 ) {
-  return useQuery({
+  const { cachePolicy = "standard", ...queryOptions } = options ?? {};
+  const policy = cacheOptions(cachePolicy);
+
+  return useQuery<T, Error>({
     queryKey,
     queryFn: () => fetchApiJson<T>(path),
-    ...options,
+    staleTime: policy.staleTime,
+    gcTime: policy.gcTime,
+    refetchOnMount: policy.refetchOnMount,
+    refetchOnWindowFocus: policy.refetchOnWindowFocus,
+    refetchOnReconnect: policy.refetchOnReconnect,
+    retry: policy.retry,
+    ...queryOptions,
   });
 }
 
@@ -79,7 +94,11 @@ export function useApiMutation<TBody, TResult = unknown>(
     mutationFn: (body: TBody) => postApiJson<TResult>(path, body),
     onSuccess: async () => {
       if (!invalidateKeys?.length) return;
-      await Promise.all(invalidateKeys.map((key) => client.invalidateQueries({ queryKey: key })));
+      await Promise.all(
+        invalidateKeys.map((key) =>
+          client.invalidateQueries({ queryKey: key }),
+        ),
+      );
     },
   });
 }

@@ -40,7 +40,11 @@ export default function AdminLeadsScreen() {
   const [selected, setSelected] = useState<UsersLeadsRow | null>(null);
   const promote = useApiMutation<{ leadId: string }, { ok: boolean; error?: string }>(
     "/api/admin/users-leads/promote",
-    [queryKeys.adminUsersLeads(), queryKeys.adminStudentPipeline()],
+    [
+      queryKeys.adminUsersLeads(),
+      queryKeys.adminStudentPipeline(),
+      queryKeys.adminCommandCentre(),
+    ],
   );
 
   const columns: DataColumn<UsersLeadsRow>[] = [

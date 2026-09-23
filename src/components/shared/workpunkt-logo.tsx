@@ -36,7 +36,7 @@ export function WorkpunktLogo({ fontSize = 40, className }: WorkpunktLogoProps) 
           className="absolute z-10"
           style={{ top: -fontSize * 0.4, right: -fontSize * 0.22 }}
         >
-          <TrademarkIcon size={tmSize} />
+          {/* <TrademarkIcon size={tmSize} /> */}
         </View>
         <Text
           className="font-bold lowercase tracking-tight text-logo-end"

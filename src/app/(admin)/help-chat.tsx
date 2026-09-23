@@ -45,7 +45,10 @@ export default function AdminHelpChatScreen() {
   const replyMutation = useApiMutation<
     { threadId: string; message: string },
     { ok: boolean; error?: string }
-  >("/api/admin/support/inbox/reply", [queryKeys.supportInboxAdmin()]);
+  >("/api/admin/support/inbox/reply", [
+    queryKeys.supportInboxAdmin(),
+    queryKeys.adminCommandCentre(),
+  ]);
 
   const readMutation = useApiMutation<
     { threadId?: string; all?: boolean },
@@ -55,7 +58,10 @@ export default function AdminHelpChatScreen() {
   const statusMutation = useApiMutation<
     { threadId: string; status: string },
     { ok: boolean }
-  >("/api/admin/support/inbox/status", [queryKeys.supportInboxAdmin()]);
+  >("/api/admin/support/inbox/status", [
+    queryKeys.supportInboxAdmin(),
+    queryKeys.adminCommandCentre(),
+  ]);
 
   return (
     <>
@@ -64,7 +70,7 @@ export default function AdminHelpChatScreen() {
         subtitle="Support inbox for students and agents"
         queryKey={queryKeys.supportInboxAdmin()}
         path="/api/admin/support/inbox"
-        staleTime={30_000}
+        cachePolicy="live"
         headerRight={
           <Pressable
             onPress={() =>

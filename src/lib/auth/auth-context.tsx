@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import type { Session, User } from "@supabase/supabase-js";
+import { useQueryClient } from "@tanstack/react-query";
 
 import {
   resolveAppRole,
@@ -16,6 +17,7 @@ import {
   type ProfileFlags,
 } from "@/lib/auth/resolve-role";
 import { bootError, bootLog, bootWarn } from "@/lib/debug/boot-log";
+import { clearAppQueryCache } from "@/lib/query/invalidate";
 import { supabase } from "@/lib/supabase/client";
 
 type AuthContextValue = {
@@ -56,6 +58,7 @@ async function loadProfile(userId: string): Promise<ProfileFlags | null> {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const queryClient = useQueryClient();
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<ProfileFlags | null>(null);
   const [loading, setLoading] = useState(true);
@@ -111,6 +114,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, next) => {
       bootLog("auth:onAuthStateChange", { event, hasSession: Boolean(next) });
+      if (event === "SIGNED_OUT") {
+        clearAppQueryCache(queryClient);
+      }
       void (async () => {
         try {
           await applySession(next);
@@ -127,10 +133,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       subscription.unsubscribe();
       bootLog("auth:provider-unmounted");
     };
-  }, [applySession]);
+  }, [applySession, queryClient]);
 
   const signIn = useCallback(async (email: string, password: string) => {
     bootLog("auth:signIn:start", { email });
+    // Avoid flashing the previous account's cached API payloads.
+    clearAppQueryCache(queryClient);
+
     const { data, error } = await supabase.auth.signInWithPassword({
       email: email.trim(),
       password,
@@ -151,14 +160,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const nextHome = roleHomePath(nextRole);
     bootLog("auth:signIn:route", { role: nextRole, dest: nextHome });
     return { error: null, role: nextRole, homePath: nextHome };
-  }, [applySession]);
+  }, [applySession, queryClient]);
 
   const signOut = useCallback(async () => {
     bootLog("auth:signOut");
     await supabase.auth.signOut();
+    clearAppQueryCache(queryClient);
     setSession(null);
     setProfile(null);
-  }, []);
+  }, [queryClient]);
 
   const refreshProfile = useCallback(async () => {
     if (!session?.user) return;

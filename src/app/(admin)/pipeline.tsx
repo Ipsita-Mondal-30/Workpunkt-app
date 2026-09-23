@@ -53,6 +53,7 @@ export default function AdminPipelineScreen() {
   >("/api/admin/student-pipeline/promote-application", [
     queryKeys.adminStudentPipeline(),
     queryKeys.adminApplicationsOps(),
+    queryKeys.adminCommandCentre(),
   ]);
   const remind = useApiMutation<
     {
@@ -62,7 +63,10 @@ export default function AdminPipelineScreen() {
       track: PipelineStudent["track"];
     },
     { ok: boolean; error?: string }
-  >("/api/admin/student-pipeline/remind", [queryKeys.adminStudentPipeline()]);
+  >("/api/admin/student-pipeline/remind", [
+    queryKeys.adminStudentPipeline(),
+    queryKeys.adminCommandCentre(),
+  ]);
 
   const columns: DataColumn<PipelineStudent>[] = [
     {

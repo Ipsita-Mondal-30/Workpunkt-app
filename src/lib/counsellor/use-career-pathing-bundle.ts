@@ -6,7 +6,7 @@ export function useCareerPathingBundle() {
   const query = useApiQuery<CareerPathingBundleResult>(
     queryKeys.agentCareerPathing(),
     "/api/agent/career-pathing",
-    { staleTime: 30_000 },
+    { cachePolicy: "heavy" },
   );
 
   const bundle = query.data?.ok === true ? (query.data as CareerPathingBundle) : null;

@@ -9,7 +9,7 @@ import { Platform } from "react-native";
  */
 
 function configuredApiUrl(): string {
-  return (process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:3001").replace(
+  return (process.env.EXPO_PUBLIC_API_URL ?? "https://www.workpunkt.com").replace(
     /\/$/,
     "",
   );

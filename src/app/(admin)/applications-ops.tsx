@@ -78,7 +78,10 @@ export default function AdminApplicationsOpsScreen() {
       pendingDocumentsNotes?: string;
     },
     { ok: boolean; error?: string }
-  >("/api/admin/applications-ops/status", [queryKeys.adminApplicationsOps()]);
+  >("/api/admin/applications-ops/status", [
+    queryKeys.adminApplicationsOps(),
+    queryKeys.adminCommandCentre(),
+  ]);
 
   const columns: DataColumn<ActiveApplication>[] = [
     {

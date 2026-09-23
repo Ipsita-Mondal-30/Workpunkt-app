@@ -44,12 +44,15 @@ export default function AdminEmailLogsScreen() {
   const updateEmail = useApiMutation<
     { oldEmail: string; newEmail: string },
     { ok: boolean; message?: string; error?: string }
-  >("/api/admin/email-logs/bounce/update");
+  >("/api/admin/email-logs/bounce/update", [
+    queryKeys.adminEmailLogs(),
+    queryKeys.scopes.admin(),
+  ]);
 
   const resend = useApiMutation<
     { emailId: string; toEmail: string },
     { ok: boolean; message?: string; error?: string }
-  >("/api/admin/email-logs/bounce/resend");
+  >("/api/admin/email-logs/bounce/resend", [queryKeys.adminEmailLogs()]);
 
   const columns: DataColumn<EmailLogListItem>[] = [
     {

@@ -1,4 +1,15 @@
 export const queryKeys = {
+  /** Top-level scopes used for broad invalidation. */
+  scopes: {
+    admin: () => ["admin"] as const,
+    agent: () => ["agent"] as const,
+    student: () => ["student"] as const,
+    counsellor: () => ["counsellor"] as const,
+    support: () => ["support"] as const,
+    klara: () => ["klara"] as const,
+    entitlements: () => ["entitlements"] as const,
+  },
+
   matches: () => ["matches"] as const,
   studentApplications: () => ["student", "applications"] as const,
   studentDocuments: () => ["student", "documents"] as const,
@@ -24,6 +35,12 @@ export const queryKeys = {
   adminEmailLogs: (after?: string | null) =>
     ["admin", "email-logs", after ?? "first"] as const,
   adminEmailLog: (id: string) => ["admin", "email-logs", "detail", id] as const,
+  counsellorMe: () => ["counsellor", "me"] as const,
+  counsellorEntitlements: () => ["counsellor", "entitlements"] as const,
+  counsellorCareerPathing: () => ["counsellor", "career-pathing"] as const,
+  counsellorStudents: () => ["counsellor", "students"] as const,
+  counsellorResources: () => ["counsellor", "resources"] as const,
+  counsellorTraining: () => ["counsellor", "training"] as const,
   klaraQualifier: (studentEmail?: string) =>
     ["klara", "qualifier", studentEmail ?? "self"] as const,
   klaraMatches: (studentEmail?: string) =>

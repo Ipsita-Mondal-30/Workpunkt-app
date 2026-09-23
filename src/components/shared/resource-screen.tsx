@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import type { QueryKey } from "@tanstack/react-query";
 
 import { useApiQuery } from "@/lib/query/use-api";
+import type { CachePolicy } from "@/lib/query/cache-policy";
 import { LoadingCards, PageHeading, PortalPage } from "@/components/portal/portal-ui";
 
 type ResourceScreenProps<T> = {
@@ -12,7 +13,10 @@ type ResourceScreenProps<T> = {
   path: string;
   children: (data: T, helpers: { refetch: () => Promise<void> }) => ReactNode;
   headerRight?: ReactNode;
+  /** @deprecated Prefer `cachePolicy` — still honored when set. */
   staleTime?: number;
+  /** Defaults to `heavy` for list/detail portal screens. */
+  cachePolicy?: CachePolicy;
 };
 
 export function ResourceScreen<T>({
@@ -22,23 +26,32 @@ export function ResourceScreen<T>({
   path,
   children,
   headerRight,
-  staleTime = 1000 * 60 * 5,
+  staleTime,
+  cachePolicy = "heavy",
 }: ResourceScreenProps<T>) {
   const query = useApiQuery<T>(queryKey, path, {
-    staleTime,
+    cachePolicy,
+    ...(staleTime != null ? { staleTime } : null),
   });
 
-  if (query.isLoading && !query.data) {
+  // Prefer cached data: only block the screen on the first load.
+  if (query.isPending && !query.data) {
     return (
-      <PortalPage><PageHeading title={title} subtitle={subtitle} /><LoadingCards /></PortalPage>
+      <PortalPage>
+        <PageHeading title={title} subtitle={subtitle} />
+        <LoadingCards />
+      </PortalPage>
     );
   }
 
   return (
-    <PortalPage refreshing={query.isRefetching && !query.isLoading} onRefresh={() => void query.refetch()}>
+    <PortalPage
+      refreshing={query.isRefetching && !query.isPending}
+      onRefresh={() => void query.refetch()}
+    >
       <PageHeading title={title} subtitle={subtitle} action={headerRight} />
 
-      {query.error ? (
+      {query.error && !query.data ? (
         <View className="mb-4 rounded-2xl bg-error/10 px-4 py-3">
           <Text className="text-sm text-error">{query.error.message}</Text>
           <Pressable onPress={() => void query.refetch()} className="mt-2">
@@ -47,7 +60,21 @@ export function ResourceScreen<T>({
         </View>
       ) : null}
 
-      {query.data != null ? children(query.data, { refetch: async () => { await query.refetch(); } }) : null}
+      {query.error && query.data ? (
+        <View className="mb-3 rounded-2xl bg-error/10 px-4 py-2">
+          <Text className="text-xs text-error">
+            Showing cached data — {query.error.message}
+          </Text>
+        </View>
+      ) : null}
+
+      {query.data != null
+        ? children(query.data, {
+            refetch: async () => {
+              await query.refetch();
+            },
+          })
+        : null}
     </PortalPage>
   );
 }

@@ -13,6 +13,9 @@ import {
 import { useTheme } from "@/lib/theme/theme-context";
 import { PageHeading, PortalCard, PortalPage } from "@/components/portal/portal-ui";
 
+/** Flip to `true` to show the Appearance / dark-mode switch again. Theme logic stays wired. */
+const SHOW_DARK_MODE_TOGGLE = false;
+
 function siteBaseUrl() {
   return getApiBaseUrl() || LEGAL_COMPANY.website.replace(/\/$/, "");
 }
@@ -47,26 +50,28 @@ export function SettingsScreen() {
         </View>
       </PortalCard>
 
-      <View className="rounded-3xl border border-border bg-surface p-5">
-        <View className="flex-row items-center justify-between">
-          <View className="flex-1 pr-4">
-            <Text className="text-base font-semibold text-text">Appearance</Text>
-            <Text className="mt-1 text-sm text-muted">
-              {isDark ? "Dark mode" : "Light mode"}
-            </Text>
+      {SHOW_DARK_MODE_TOGGLE ? (
+        <View className="rounded-3xl border border-border bg-surface p-5">
+          <View className="flex-row items-center justify-between">
+            <View className="flex-1 pr-4">
+              <Text className="text-base font-semibold text-text">Appearance</Text>
+              <Text className="mt-1 text-sm text-muted">
+                {isDark ? "Dark mode" : "Light mode"}
+              </Text>
+            </View>
+            <Switch
+              value={isDark}
+              onValueChange={() => void toggleTheme()}
+              trackColor={{ false: "#e4e4e7", true: "#f6339a" }}
+              thumbColor="#ffffff"
+              accessibilityLabel="Toggle dark mode"
+            />
           </View>
-          <Switch
-            value={isDark}
-            onValueChange={() => void toggleTheme()}
-            trackColor={{ false: "#e4e4e7", true: "#f6339a" }}
-            thumbColor="#ffffff"
-            accessibilityLabel="Toggle dark mode"
-          />
+          <Text className="mt-3 text-xs text-muted">
+            Current theme: {theme}. Preference is saved on this device.
+          </Text>
         </View>
-        <Text className="mt-3 text-xs text-muted">
-          Current theme: {theme}. Preference is saved on this device.
-        </Text>
-      </View>
+      ) : null}
 
       <View className="mt-5 rounded-3xl border border-border bg-surface p-5">
         <Text className="text-base font-semibold text-text">Legal</Text>

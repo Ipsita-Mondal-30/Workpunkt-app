@@ -18,13 +18,13 @@ export function useCounsellorAccess() {
   const entitlementsQuery = useApiQuery<EntitlementsMeSummary>(
     queryKeys.entitlementsMe(),
     "/api/entitlements/me",
-    { staleTime: 30_000 },
+    { cachePolicy: "standard" },
   );
 
   const dashboardQuery = useApiQuery<AgentDashboardData>(
     queryKeys.agentDashboard(),
     "/api/agent/dashboard",
-    { staleTime: 30_000 },
+    { cachePolicy: "standard" },
   );
 
   const entitlements = entitlementsQuery.data;

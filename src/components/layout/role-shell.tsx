@@ -45,7 +45,7 @@ export function RoleShell({ role, title, children }: { role: AppRole; title: str
   const { profile, signOut } = useAuth();
   const { isDark } = useTheme();
   const counsellorCtx = useOptionalCounsellorContext();
-  const notifications = useApiQuery<AgentNotification[]>(queryKeys.agentNotifications(), "/api/agent/notifications", { enabled: role === "agent", staleTime: 30_000 });
+  const notifications = useApiQuery<AgentNotification[]>(queryKeys.agentNotifications(), "/api/agent/notifications", { enabled: role === "agent", cachePolicy: "live" });
   const unread = (notifications.data ?? []).filter((item) => !item.isRead).length;
   const base = ROLE_NAV[role];
   const insertAt = Math.max(0, base.findIndex((item) => item.label === "Training Hub"));
