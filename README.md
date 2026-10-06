@@ -25,6 +25,31 @@ In the output, you'll find options to open the app in a
 
 You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
 
+## Build for Android (EAS)
+
+One-time setup:
+
+```bash
+npx eas-cli login
+# .env is gitignored, so EAS builds read these from EAS environment variables
+npx eas-cli env:create --environment production --name EXPO_PUBLIC_SUPABASE_URL --value <url> --visibility plaintext
+npx eas-cli env:create --environment production --name EXPO_PUBLIC_SUPABASE_ANON_KEY --value <anon-key> --visibility plaintext
+```
+
+AAB (upload to Play Store):
+
+```bash
+npx eas-cli build --platform android --profile production
+```
+
+APK (install directly on a device for testing):
+
+```bash
+npx eas-cli build --platform android --profile preview
+```
+
+Download the file from the build link printed when the build finishes. Submit the AAB with `npx eas-cli submit --platform android --latest`, or upload it in Play Console.
+
 ## Get a fresh project
 
 When you're ready, run:

@@ -25,7 +25,8 @@ function loadDotEnv(filePath) {
 }
 
 module.exports = ({ config }) => {
-  const env = loadDotEnv(path.join(__dirname, ".env"));
+  // .env is gitignored, so EAS builds get these from EAS environment variables instead.
+  const env = { ...process.env, ...loadDotEnv(path.join(__dirname, ".env")) };
 
   const apiUrl = (env.EXPO_PUBLIC_API_URL ?? "https://www.workpunkt.com").replace(
     /\/$/,

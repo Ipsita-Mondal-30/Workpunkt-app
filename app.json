@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "workpunkt-app",
+    "name": "Workpunkt",
     "slug": "workpunkt-app",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -21,7 +21,11 @@
       ]
     },
     "android": {
-      "usesCleartextTraffic": true,
+      "blockedPermissions": [
+        "android.permission.SYSTEM_ALERT_WINDOW",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE"
+      ],
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
