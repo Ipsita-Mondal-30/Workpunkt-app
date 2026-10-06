@@ -24,7 +24,7 @@ function loadDotEnv(filePath) {
   return values;
 }
 
-module.exports = () => {
+module.exports = ({ config }) => {
   const env = loadDotEnv(path.join(__dirname, ".env"));
 
   const apiUrl = (env.EXPO_PUBLIC_API_URL ?? "https://www.workpunkt.com").replace(
@@ -50,12 +50,13 @@ module.exports = () => {
   }
 
   return {
-    expo: {
-      ...appJson.expo,
-      extra: {
-        apiUrl,
-        signupUrl,
-      },
+    ...appJson.expo,
+    ...config,
+    extra: {
+      ...appJson.expo.extra,
+      ...config?.extra,
+      apiUrl,
+      signupUrl,
     },
   };
 };
